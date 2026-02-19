@@ -1,8 +1,8 @@
 ---
 name: 개발 작업
 about: 특정 개발 작업을 추적합니다.
-title: "[task] "
-labels: enhancement
+title: "[Feat] "
+labels: feat
 assignees: ''
 
 ---
@@ -11,9 +11,9 @@ assignees: ''
 수행해야 할 개발 작업에 대해 설명해주세요.
 
 **수락 기준**
-- [ ] 기준 1
-- [ ] 기준 2
-- [ ] 기준 3
+- 기준 1
+- 기준 2
+- 기준 3
 
 **관련 이슈**
 관련된 이슈나 PR을 링크해주세요.
