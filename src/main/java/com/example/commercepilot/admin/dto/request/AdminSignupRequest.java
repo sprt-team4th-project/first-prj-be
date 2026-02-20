@@ -1,4 +1,4 @@
-package com.example.commercepilot.admin.dto;
+package com.example.commercepilot.admin.dto.request;
 
 import com.example.commercepilot.admin.entity.AdminRole;
 import jakarta.validation.constraints.Email;
