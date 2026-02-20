@@ -1,4 +1,4 @@
-package com.example.commercepilot.admin.dto;
+package com.example.commercepilot.admin.dto.response;
 
 import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.admin.entity.AdminRole;
