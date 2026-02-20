@@ -15,6 +15,15 @@ public enum ErrorCode {
 //    일정 관련 에러 코드("S###")
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 일정은 존재하지 않습니다."),
 
+    // 관리자 관련 에러 코드("M###")
+    ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "M001", "이미 사용 중인 이메일입니다."),
+    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "해당 관리자는 존재하지 않습니다."),
+    ADMIN_LOGIN_NOT_ACTIVE(HttpStatus.FORBIDDEN, "M003", "활성 상태의 관리자만 로그인할 수 있습니다."),
+    ADMIN_PENDING(HttpStatus.FORBIDDEN, "M004", "승인대기 상태입니다."),
+    ADMIN_REJECTED(HttpStatus.FORBIDDEN, "M005", "가입 신청이 거부된 계정입니다."),
+    ADMIN_SUSPENDED(HttpStatus.FORBIDDEN, "M006", "정지된 계정입니다."),
+    ADMIN_INACTIVE(HttpStatus.FORBIDDEN, "M007", "비활성화된 계정입니다."),
+
 //    유저 관련 에러 코드("U###")
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 유저는 존재하지 않습니다"),
 
