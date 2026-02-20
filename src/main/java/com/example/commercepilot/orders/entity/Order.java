@@ -7,16 +7,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
 
-<<<<<<< Updated upstream
-import java.util.ArrayList;
 
-=======
-@SoftDelete(columnName = "is_deleted")
->>>>>>> Stashed changes
 @Getter
 @Entity
 @Table(name = "orders")
-@SoftDelete(columnName = "isdeleted")
+@SoftDelete(columnName = "is_deleted")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 

@@ -1,4 +1,4 @@
-package com.example.commercepilot.admin.dto;
+package com.example.commercepilot.admin.service;
 
 public class AdminCommandService {
 }
