@@ -1,6 +1,7 @@
 package com.example.commercepilot.orders.dto.response;
 
 import com.example.commercepilot.orders.entity.Order;
+import com.example.commercepilot.orders.entity.OrderStatus;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -15,7 +16,7 @@ public class OrderListResponse {
     private final int quantity;
     private final Long totalPrice;
     private final LocalDateTime orderedAt;
-    private final Order.OrderStatus status;
+    private final OrderStatus status;
     private final String adminName;
 
     private OrderListResponse(Order order) {
