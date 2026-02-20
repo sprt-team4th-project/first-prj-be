@@ -7,10 +7,12 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
 
-@SoftDelete(columnName = "isdeleted")
+import java.util.ArrayList;
+
 @Getter
 @Entity
 @Table(name = "orders")
+@SoftDelete(columnName = "isdeleted")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Order extends BaseEntity {
 
@@ -20,7 +22,17 @@ public class Order extends BaseEntity {
 
     private Long totalPrice;
 
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "customer_id", nullable = false)
     private Customer customer;
+
+    @OneToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "product_id", nullable = false)
+    private Product product;
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "admin_id", nullable = false)
+    private Admin admin;
 
     @Enumerated(EnumType.STRING)
     private OrderStatus status;
@@ -29,3 +41,6 @@ public class Order extends BaseEntity {
         PENDING, CONFIRMED, SHIPPING, DELIVERED, CANCELLED
     }
 }
+
+
+
