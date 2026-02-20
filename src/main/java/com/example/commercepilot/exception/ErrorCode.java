@@ -24,6 +24,15 @@ public enum ErrorCode {
     ADMIN_SUSPENDED(HttpStatus.FORBIDDEN, "M006", "정지된 계정입니다."),
     ADMIN_INACTIVE(HttpStatus.FORBIDDEN, "M007", "비활성화된 계정입니다."),
 
+    // 상품 관련 에러 코드("P###")
+    PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "P001", "단종된 상품입니다."),
+    PRODUCT_SOLD_OUT(HttpStatus.BAD_REQUEST, "P002", "품절된 상품입니다."),
+    INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "P003", "재고가 부족합니다."),
+
+    // 고객 관련 에러 코드("CU###")
+    CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
+    CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CU002", "해당 고객을 찾을 수 없습니다."),
+
 //    유저 관련 에러 코드("U###")
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 유저는 존재하지 않습니다"),
 
