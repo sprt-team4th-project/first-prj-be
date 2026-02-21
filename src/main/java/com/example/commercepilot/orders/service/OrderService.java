@@ -1,6 +1,7 @@
 package com.example.commercepilot.orders.service;
 
 import com.example.commercepilot.admin.entity.Admin;
+import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
@@ -14,6 +15,7 @@ import com.example.commercepilot.orders.dto.session.SessionCustomer;
 import com.example.commercepilot.orders.entity.Order;
 import com.example.commercepilot.orders.entity.OrderStatus;
 import com.example.commercepilot.orders.repository.OrderRepository;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -33,8 +35,38 @@ public class OrderService {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        long price = product.getPrice();
-        int stock = product.getStock();
+        validateProduct(product, request.quantity());
+
+        long totalPrice = request.quantity() * product.getPrice();
+
+        Customer customer;
+        Admin admin = null;
+
+        if (sessionCustomer != null) {
+            customer = customerRepository.findById(sessionCustomer.customerId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+        } else {
+            if (sessionAdmin.role() != AdminRole.CS_ADMIN) {
+                throw new CustomException(ErrorCode.FORBIDDEN);
+            }
+            if (request.customerId() == null) {
+                throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
+            }
+            admin = adminRepository.findById(sessionAdmin.adminId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+            customer = customerRepository.findById(request.customerId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+        }
+
+        product.decreaseStock(request.quantity());
+
+        Order order = new Order(totalPrice, request.quantity(), customer, product, admin, OrderStatus.PENDING);
+        Order savedOrder = orderRepository.save(order);
+
+        return OrderCreateResponse.from(savedOrder);
+    }
+
+    private void validateProduct(Product product, int quantity) {
         ProductStatus productStatus = product.getStatus();
 
         if (productStatus == ProductStatus.DISCONTINUED) {
@@ -46,41 +78,6 @@ public class OrderService {
         if (stock < request.quantity()) {
             throw new CustomException(ErrorCode.INSUFFICIENT_STOCK);
         }
-
-        long totalPrice = request.quantity() * price;
-
-        if (sessionCustomer != null) {
-            Customer customer = customerRepository.findById(sessionCustomer.customerId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-
-            product.decreaseStock(request.quantity());
-
-            Order order = new Order(totalPrice, request.quantity(), customer, product, null, OrderStatus.PENDING);
-
-            Order savedOrder = orderRepository.save(order);
-
-            return OrderCreateResponse.from(savedOrder);
-        } else if (!"CS_ADMIN".equals(sessionAdmin.role())) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
-        }
-
-        if (request.customerId() == null) {
-            throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
-        }
-
-        Admin admin = adminRepository.findById(sessionAdmin.adminId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        Customer customer = customerRepository.findById(request.customerId())
-                .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-
-        product.decreaseStock(request.quantity());
-
-        Order order = new Order(totalPrice, request.quantity(), customer, product, admin, OrderStatus.PENDING);
-
-        Order savedOrder = orderRepository.save(order);
-
-        return OrderCreateResponse.from(savedOrder);
     }
 
     @Transactional
