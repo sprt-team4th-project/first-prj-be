@@ -70,4 +70,8 @@ public class Admin {
     void preUpdate() {
         this.modifiedAt = LocalDateTime.now();
     }
+
+    public void changeStatus(AdminStatus status) {
+        this.status = status;
+    }
 }

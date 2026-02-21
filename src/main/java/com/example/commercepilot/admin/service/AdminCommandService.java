@@ -3,6 +3,7 @@ package com.example.commercepilot.admin.service;
 import com.example.commercepilot.admin.dto.request.AdminSignupRequest;
 import com.example.commercepilot.admin.dto.response.AdminSignupResponse;
 import com.example.commercepilot.admin.entity.Admin;
+import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.config.PasswordEncoder;
 import com.example.commercepilot.exception.CustomException;
@@ -37,5 +38,31 @@ public class AdminCommandService {
 
         Admin saved = adminRepository.save(admin);
         return AdminSignupResponse.from(saved);
+    }
+
+    @Transactional
+    public void approve(Long adminId) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        if (admin.getStatus() != AdminStatus.PENDING) {
+            throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
+        }
+
+        admin.changeStatus(AdminStatus.ACTIVE);
+    }
+
+    @Transactional
+    public void reject(Long adminId) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        if (admin.getStatus() != AdminStatus.PENDING) {
+            throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
+        }
+
+        admin.changeStatus(AdminStatus.REJECTED);
     }
 }
