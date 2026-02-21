@@ -15,7 +15,6 @@ import com.example.commercepilot.orders.dto.session.SessionCustomer;
 import com.example.commercepilot.orders.entity.Order;
 import com.example.commercepilot.orders.entity.OrderStatus;
 import com.example.commercepilot.orders.repository.OrderRepository;
-import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,7 +34,7 @@ public class OrderService {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        validateProduct(product, request.quantity());
+        validateProduct(product, request);
 
         long totalPrice = request.quantity() * product.getPrice();
 
@@ -66,7 +65,7 @@ public class OrderService {
         return OrderCreateResponse.from(savedOrder);
     }
 
-    private void validateProduct(Product product, int quantity) {
+    private void validateProduct(Product product, OrderCreateRequest request) {
         ProductStatus productStatus = product.getStatus();
 
         if (productStatus == ProductStatus.DISCONTINUED) {
@@ -75,7 +74,7 @@ public class OrderService {
         if (productStatus == ProductStatus.SOLD_OUT) {
             throw new CustomException(ErrorCode.PRODUCT_SOLD_OUT);
         }
-        if (stock < request.quantity()) {
+        if (product.getStock() < request.quantity()) {
             throw new CustomException(ErrorCode.INSUFFICIENT_STOCK);
         }
     }
@@ -85,17 +84,7 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
-        OrderStatus status = order.getStatus();
-
-        if (status == OrderStatus.PENDING) {
-            status = OrderStatus.SHIPPING;
-        } else if (status == OrderStatus.SHIPPING) {
-            status = OrderStatus.DELIVERED;
-        } else {
-            throw new CustomException(ErrorCode.ORDER_STATUS_NOT_CHANGEABLE);
-        }
-
-        order.changeStatus(status);
+        order.proceed();
 
         return OrderUpdateResponse.from(order);
     }
@@ -111,7 +100,7 @@ public class OrderService {
             throw new CustomException(ErrorCode.FORBIDDEN);
         }
         if (!order.getStatus().equals(OrderStatus.PENDING)) {
-            throw new CustomException(ErrorCode.ORDER_CANCLE_NOT_ALLOWED);
+            throw new CustomException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
         Product product = order.getProduct();

@@ -2,6 +2,8 @@ package com.example.commercepilot.orders.entity;
 
 import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.config.BaseEntity;
+import com.example.commercepilot.exception.CustomException;
+import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -60,8 +62,14 @@ public class Order extends BaseEntity {
         this.status = status;
     }
 
-    public void changeStatus(OrderStatus orderStatus) {
-        this.status = orderStatus;
+    public void proceed() {
+        if (this.status == OrderStatus.PENDING) {
+            this.status = OrderStatus.SHIPPING;
+        } else if (this.status == OrderStatus.SHIPPING) {
+            this.status = OrderStatus.DELIVERED;
+        } else {
+            throw new CustomException(ErrorCode.ORDER_STATUS_NOT_CHANGEABLE);
+        }
     }
 
     public void cancel(String cancelText) {
