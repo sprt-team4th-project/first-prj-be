@@ -6,6 +6,7 @@ import com.example.commercepilot.customer.dto.response.CustomerDeleteResponse;
 import com.example.commercepilot.customer.dto.response.CustomerStatusResponse;
 import com.example.commercepilot.customer.dto.response.CustomerUpdateResponse;
 import com.example.commercepilot.customer.entity.Customer;
+import com.example.commercepilot.customer.entity.CustomerStatus;
 import com.example.commercepilot.customer.repository.CustomerRepository;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
@@ -48,7 +49,7 @@ public class CustomerService {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
 
-        customerRepository.delete(customer);
+        customer.changeStatus(CustomerStatus.DELETED);
 
         return CustomerDeleteResponse.from(customer);
     }
