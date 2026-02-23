@@ -1,5 +1,7 @@
 package com.example.commercepilot.customer.entity;
 
+import com.example.commercepilot.config.BaseEntity;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 import jakarta.persistence.*;
@@ -10,10 +12,11 @@ import java.time.LocalDateTime;
 
 @Getter
 @Entity
+@SoftDelete(columnName = "is_deleted")
 @NoArgsConstructor
 @Table(name = "customers")
 @EntityListeners(AuditingEntityListener.class)
-public class Customer {
+public class Customer extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -40,28 +43,22 @@ public class Customer {
     @Column(nullable = false)
     private CustomerStatus status;
 
-    // 생성 시간
-    @CreatedDate
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
-    // 수정 시간
-    @LastModifiedDate
-    @Column(nullable = false)
-    private LocalDateTime modifiedAt;
+
+
 
     // ===== 고객 정보 수정 =====
     public void updateInfo(String name, String email, String phone) {
         this.customerName = name;
         this.email = email;
         this.callNumber = phone;
-        this.modifiedAt = LocalDateTime.now();
+
     }
 
     // ===== 고객 상태 변경 =====
     public void changeStatus(CustomerStatus status) {
         this.status = status;
-        this.modifiedAt = LocalDateTime.now();
+
     }
 }
 
