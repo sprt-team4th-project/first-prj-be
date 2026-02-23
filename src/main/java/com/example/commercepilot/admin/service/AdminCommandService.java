@@ -1,8 +1,11 @@
 package com.example.commercepilot.admin.service;
 
+import com.example.commercepilot.admin.dto.request.AdminPasswordChangeRequest;
 import com.example.commercepilot.admin.dto.request.AdminSignupRequest;
+import com.example.commercepilot.admin.dto.request.AdminUpdateRequest;
 import com.example.commercepilot.admin.dto.response.AdminSignupResponse;
 import com.example.commercepilot.admin.entity.Admin;
+import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.config.PasswordEncoder;
 import com.example.commercepilot.exception.CustomException;
@@ -37,5 +40,62 @@ public class AdminCommandService {
 
         Admin saved = adminRepository.save(admin);
         return AdminSignupResponse.from(saved);
+    }
+
+    @Transactional
+    public void approve(Long adminId) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        if (admin.getStatus() != AdminStatus.PENDING) {
+            throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
+        }
+
+        admin.changeStatus(AdminStatus.ACTIVE);
+    }
+
+    @Transactional
+    public void reject(Long adminId) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        if (admin.getStatus() != AdminStatus.PENDING) {
+            throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
+        }
+
+        admin.changeStatus(AdminStatus.REJECTED);
+    }
+
+    @Transactional(readOnly = true)
+    public AdminSignupResponse getMyProfile(Long adminId) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        return AdminSignupResponse.from(admin);
+    }
+
+    @Transactional
+    public void updateMyProfile(Long adminId, AdminUpdateRequest request) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        admin.updateProfile(request.name(), request.email(), request.callNumber());
+    }
+
+    @Transactional
+    public void changePassword(Long adminId, AdminPasswordChangeRequest request) {
+
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        if (!passwordEncoder.matches(request.currentPassword(), admin.getPassword())) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        String encoded = passwordEncoder.encode(request.newPassword());
+        admin.changePassword(encoded);
     }
 }

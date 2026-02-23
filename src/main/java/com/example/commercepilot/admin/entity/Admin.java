@@ -70,4 +70,18 @@ public class Admin {
     void preUpdate() {
         this.modifiedAt = LocalDateTime.now();
     }
+
+    public void changeStatus(AdminStatus status) {
+        this.status = status;
+    }
+
+    public void updateProfile(String name, String email, String callNumber) {
+        this.adminName = name;
+        this.email = email;
+        this.callNumber = callNumber;
+    }
+
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
