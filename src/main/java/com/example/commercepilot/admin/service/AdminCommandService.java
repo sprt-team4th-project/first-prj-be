@@ -1,10 +1,12 @@
 package com.example.commercepilot.admin.service;
 
+import com.example.commercepilot.admin.dto.request.AdminModifyRequest;
 import com.example.commercepilot.admin.dto.request.AdminPasswordChangeRequest;
 import com.example.commercepilot.admin.dto.request.AdminSignupRequest;
 import com.example.commercepilot.admin.dto.request.AdminUpdateRequest;
 import com.example.commercepilot.admin.dto.response.AdminSignupResponse;
 import com.example.commercepilot.admin.entity.Admin;
+import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.config.PasswordEncoder;
@@ -49,7 +51,6 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -63,7 +64,6 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -99,5 +99,42 @@ public class AdminCommandService {
                 request.newPassword(),
                 request.newPasswordConfirm()
         );
+    }
+
+    @Transactional
+    public void updateAdmin(Long adminId, AdminModifyRequest request) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        if (!admin.getEmail().equals(request.email())
+                && adminRepository.existsByEmail(request.email())) {
+            throw new CustomException(ErrorCode.ADMIN_EMAIL_DUPLICATED);
+        }
+
+        admin.updateProfile(request.name(), request.email(), request.callNumber());
+    }
+
+    @Transactional
+    public void changeRole(Long adminId, AdminRole role) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        admin.changeRole(role);
+    }
+
+    @Transactional
+    public void changeStatus(Long adminId, AdminStatus status) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        admin.changeStatus(status);
+    }
+
+    @Transactional
+    public void deleteAdmin(Long adminId) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        admin.delete(); // status를 DELETED로 변경하는 소프트 삭제
     }
 }

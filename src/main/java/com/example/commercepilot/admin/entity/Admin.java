@@ -115,4 +115,11 @@ public class Admin {
         String encoded = passwordEncoder.encode(newPassword);
         this.changePassword(encoded);
     }
+    public void changeRole(AdminRole role) {
+        this.role = role;
+    }
+
+    public void delete() {
+        this.status = AdminStatus.DELETED;
+    }
 }
