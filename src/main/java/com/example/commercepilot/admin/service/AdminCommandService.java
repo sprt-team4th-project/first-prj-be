@@ -93,22 +93,11 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // 1) 현재 비밀번호 검증
-        if (!passwordEncoder.matches(request.currentPassword(), admin.getPassword())) {
-            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
-        }
-
-        // 2) 새 비밀번호 확인값 검증
-        if (!request.newPassword().equals(request.newPasswordConfirm())) {
-            throw new CustomException(ErrorCode.NEW_PASSWORD_CONFIRM_MISMATCH);
-        }
-
-        // 3) 기존 비밀번호와 동일한 새 비밀번호 방지
-        if (passwordEncoder.matches(request.newPassword(), admin.getPassword())) {
-            throw new CustomException(ErrorCode.ALREADY_USED_PASSWORD);
-        }
-
-        String encoded = passwordEncoder.encode(request.newPassword());
-        admin.changePassword(encoded);
+        admin.changePasswordWithValidation(
+                passwordEncoder,
+                request.currentPassword(),
+                request.newPassword(),
+                request.newPasswordConfirm()
+        );
     }
 }
