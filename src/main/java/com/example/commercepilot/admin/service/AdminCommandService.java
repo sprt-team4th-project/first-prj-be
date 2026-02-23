@@ -1,12 +1,12 @@
 package com.example.commercepilot.admin.service;
 
-import com.example.commercepilot.admin.dto.request.AdminModifyRequest;     // ✅ 추가
+import com.example.commercepilot.admin.dto.request.AdminModifyRequest;
 import com.example.commercepilot.admin.dto.request.AdminPasswordChangeRequest;
 import com.example.commercepilot.admin.dto.request.AdminSignupRequest;
 import com.example.commercepilot.admin.dto.request.AdminUpdateRequest;
 import com.example.commercepilot.admin.dto.response.AdminSignupResponse;
 import com.example.commercepilot.admin.entity.Admin;
-import com.example.commercepilot.admin.entity.AdminRole;                 // ✅ 추가
+import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.config.PasswordEncoder;
@@ -106,7 +106,8 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        if (!admin.getEmail().equals(request.email()) && adminRepository.existsByEmail(request.email())) {
+        if (!admin.getEmail().equals(request.email())
+                && adminRepository.existsByEmail(request.email())) {
             throw new CustomException(ErrorCode.ADMIN_EMAIL_DUPLICATED);
         }
 
@@ -134,6 +135,6 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        adminRepository.delete(admin);
+        admin.delete(); // status를 DELETED로 변경하는 소프트 삭제
     }
 }

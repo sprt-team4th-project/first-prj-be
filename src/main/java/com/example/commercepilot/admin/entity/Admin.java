@@ -118,4 +118,8 @@ public class Admin {
     public void changeRole(AdminRole role) {
         this.role = role;
     }
+
+    public void delete() {
+        this.status = AdminStatus.DELETED;
+    }
 }

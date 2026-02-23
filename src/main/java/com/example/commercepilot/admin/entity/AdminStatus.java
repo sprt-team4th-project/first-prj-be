@@ -5,5 +5,6 @@ public enum AdminStatus {
     INACTIVE,
     SUSPENDED,
     PENDING,
-    REJECTED
+    REJECTED,
+    DELETED
 }
