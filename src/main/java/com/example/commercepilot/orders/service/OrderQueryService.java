@@ -1,7 +1,11 @@
 package com.example.commercepilot.orders.service;
 
+import com.example.commercepilot.exception.CustomException;
+import com.example.commercepilot.exception.ErrorCode;
 import com.example.commercepilot.orders.dto.request.OrderSearchRequest;
+import com.example.commercepilot.orders.dto.response.OrderDetailResponse;
 import com.example.commercepilot.orders.dto.response.OrderListResponse;
+import com.example.commercepilot.orders.entity.Order;
 import com.example.commercepilot.orders.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -30,5 +34,11 @@ public class OrderQueryService {
                         request.getStatus(),
                         pageable)
                 .map(OrderListResponse::from);
+    }
+
+    public OrderDetailResponse getOrderDetail(Long orderId) {
+        Order order = orderRepository.findByIdWithDetails(orderId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
+        return OrderDetailResponse.from(order);
     }
 }

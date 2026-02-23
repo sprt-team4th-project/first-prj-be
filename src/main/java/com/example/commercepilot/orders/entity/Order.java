@@ -10,6 +10,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
 
+
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;
@@ -19,7 +20,7 @@ import java.util.UUID;
 @Table(name = "orders")
 @SoftDelete(columnName = "is_deleted")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-public class Order extends BaseEntity {
+public class  Order extends BaseEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

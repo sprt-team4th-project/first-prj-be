@@ -46,7 +46,7 @@ public class OrderService {
                     .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
         } else {
             if (sessionAdmin.role() != AdminRole.CS_ADMIN) {
-                throw new CustomException(ErrorCode.FORBIDDEN);
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
             }
             if (request.customerId() == null) {
                 throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);

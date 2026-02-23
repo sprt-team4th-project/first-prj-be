@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.Optional;
+
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o FROM Order o JOIN FETCH o.customer c " +
@@ -17,4 +19,11 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             @Param("keyword") String keyword,
             @Param("status") OrderStatus status,
             Pageable pageable);
+
+    @Query("SELECT o FROM Order o " +
+           "JOIN FETCH o.customer c " +
+           "JOIN FETCH o.product p " +
+           "LEFT JOIN FETCH o.admin a " +
+           "WHERE o.id = :orderId")
+    Optional<Order> findByIdWithDetails(@Param("orderId") Long orderId);
 }

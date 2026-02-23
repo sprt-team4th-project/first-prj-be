@@ -1,5 +1,8 @@
 package com.example.commercepilot.admin.entity;
 
+import com.example.commercepilot.config.PasswordEncoder;
+import com.example.commercepilot.exception.CustomException;
+import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -83,5 +86,40 @@ public class Admin {
 
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
+    }
+
+    /**
+     * 비밀번호 변경(검증 포함)을 Admin 도메인 책임으로 위임
+     */
+    public void changePasswordWithValidation(
+            PasswordEncoder passwordEncoder,
+            String currentPassword,
+            String newPassword,
+            String newPasswordConfirm
+    ) {
+        // 1) 현재 비밀번호 검증
+        if (!passwordEncoder.matches(currentPassword, this.password)) {
+            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // 2) 새 비밀번호 확인값 검증
+        if (!newPassword.equals(newPasswordConfirm)) {
+            throw new CustomException(ErrorCode.NEW_PASSWORD_CONFIRM_MISMATCH);
+        }
+
+        // 3) 기존 비밀번호와 동일한 새 비밀번호 방지
+        if (passwordEncoder.matches(newPassword, this.password)) {
+            throw new CustomException(ErrorCode.ALREADY_USED_PASSWORD);
+        }
+
+        String encoded = passwordEncoder.encode(newPassword);
+        this.changePassword(encoded);
+    }
+    public void changeRole(AdminRole role) {
+        this.role = role;
+    }
+
+    public void delete() {
+        this.status = AdminStatus.DELETED;
     }
 }

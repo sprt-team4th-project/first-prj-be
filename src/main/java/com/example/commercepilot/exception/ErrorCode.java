@@ -11,6 +11,8 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "A002", "입력값이 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A003", "로그인이 필요한 기능입니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "A004", "권한이 없습니다."),
+    ALREADY_USED_PASSWORD(HttpStatus.BAD_REQUEST, "A005", "이미 사용 중인 비밀번호입니다."),
+    NEW_PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "A006", "새 비밀번호 확인이 일치하지 않습니다."),
 
 //    일정 관련 에러 코드("S###")
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 일정은 존재하지 않습니다."),
@@ -32,6 +34,7 @@ public enum ErrorCode {
     // 고객 관련 에러 코드("CU###")
     CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CU002", "해당 고객을 찾을 수 없습니다."),
+    CUSTOMER_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "CU003", "이미 사용 중인 이메일입니다."),
 
 //    유저 관련 에러 코드("U###")
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 유저는 존재하지 않습니다"),
@@ -41,7 +44,12 @@ public enum ErrorCode {
     COMMENT_NOT_IN_SCHEDULE(HttpStatus.NOT_FOUND, "C002", "해당 일정에 속한 댓글이 아닙니다."),
 
 //    로그인 관련 에러 코드("L###")
-    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다.");
+    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다."),
+
+    // 주문 관련 에러 코드("O###")
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "해당 주문을 찾을 수 없습니다."),
+    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "O002", "취소할 수 없는 주문입니다."),
+    ORDER_STATUS_NOT_CHANGEABLE(HttpStatus.BAD_REQUEST, "O003", "변경할 수 없는 주문 상태입니다.");
 
     private final HttpStatus status;
     private final String code;

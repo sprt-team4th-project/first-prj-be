@@ -8,6 +8,7 @@ import com.example.commercepilot.orders.dto.request.OrderDeleteRequest;
 import com.example.commercepilot.orders.dto.request.OrderSearchRequest;
 import com.example.commercepilot.orders.dto.response.OrderCreateResponse;
 import com.example.commercepilot.orders.dto.response.OrderDeleteResponse;
+import com.example.commercepilot.orders.dto.response.OrderDetailResponse;
 import com.example.commercepilot.orders.dto.response.OrderListResponse;
 import com.example.commercepilot.orders.dto.response.OrderUpdateResponse;
 import com.example.commercepilot.orders.dto.session.SessionAdmin;
@@ -47,6 +48,13 @@ public class OrderController {
     public ResponseEntity<Page<OrderListResponse>> getOrders(
             @Valid @ModelAttribute OrderSearchRequest request) {
         return ResponseEntity.ok(orderQueryService.getOrders(request));
+    }
+
+    @GetMapping("/{orderId}")
+    public ResponseEntity<ApiResponse<OrderDetailResponse>> getOrderDetail(
+            @PathVariable Long orderId) {
+        return ResponseEntity.ok(
+                ApiResponse.success(HttpStatus.OK, orderQueryService.getOrderDetail(orderId)));
     }
 
     @PutMapping("/{orderId}")
