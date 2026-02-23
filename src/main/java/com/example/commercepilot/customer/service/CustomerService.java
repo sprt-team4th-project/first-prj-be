@@ -27,6 +27,10 @@ public class CustomerService {
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
 
+        if (customerRepository.existsByEmailAndIdNot(request.getEmail(), customerId)) {
+            throw new CustomException(ErrorCode.CUSTOMER_EMAIL_DUPLICATED);
+        }
+
         customer.updateInfo(request.getCustomerName(), request.getEmail(), request.getCallNumber());
 
         return CustomerUpdateResponse.from(customer);

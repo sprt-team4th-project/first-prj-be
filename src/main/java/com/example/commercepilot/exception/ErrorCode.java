@@ -34,6 +34,7 @@ public enum ErrorCode {
     // 고객 관련 에러 코드("CU###")
     CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CU002", "해당 고객을 찾을 수 없습니다."),
+    CUSTOMER_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "CU003", "이미 사용 중인 이메일입니다."),
 
 //    유저 관련 에러 코드("U###")
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 유저는 존재하지 않습니다"),
