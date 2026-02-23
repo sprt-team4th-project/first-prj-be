@@ -43,7 +43,12 @@ public enum ErrorCode {
     COMMENT_NOT_IN_SCHEDULE(HttpStatus.NOT_FOUND, "C002", "해당 일정에 속한 댓글이 아닙니다."),
 
 //    로그인 관련 에러 코드("L###")
-    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다.");
+    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다."),
+
+    // 주문 관련 에러 코드("O###")
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "해당 주문을 찾을 수 없습니다."),
+    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "O002", "취소할 수 없는 주문입니다."),
+    ORDER_STATUS_NOT_CHANGEABLE(HttpStatus.BAD_REQUEST, "O003", "변경할 수 없는 주문 상태입니다.");
 
     private final HttpStatus status;
     private final String code;
