@@ -84,4 +84,7 @@ public class Admin {
     public void changePassword(String encodedPassword) {
         this.password = encodedPassword;
     }
+    public void changePassword(String encodedPassword) {
+        this.password = encodedPassword;
+    }
 }
