@@ -1,6 +1,7 @@
 package com.example.commercepilot.orders.dto.request;
 
 import com.example.commercepilot.orders.entity.Order;
+import com.example.commercepilot.orders.entity.OrderStatus;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
@@ -20,5 +21,5 @@ public class OrderSearchRequest {
 
     private String sortBy = "createdAt";             // 정렬 기준: quantity, totalPrice, createdAt
     private String sortDir = "desc";                 // 정렬 순서: asc, desc
-    private Order.OrderStatus status;                // 상태 필터
+    private OrderStatus status;                // 상태 필터
 }
