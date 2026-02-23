@@ -127,7 +127,7 @@ public class Product extends BaseEntity {
         this.price = updatePrice;
     }
 
-    public void disontinue() {
+    public void disontinued() {
         this.status = ProductStatus.DISCONTINUED;
 
     }
