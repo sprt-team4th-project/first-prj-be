@@ -100,4 +100,41 @@ public class AdminCommandService {
                 request.newPasswordConfirm()
         );
     }
+
+    @Transactional
+    public void updateAdmin(Long adminId, AdminModifyRequest request) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        // 이메일 중복 검증(권장)
+        if (!admin.getEmail().equals(request.email()) && adminRepository.existsByEmail(request.email())) {
+            throw new CustomException(ErrorCode.ADMIN_EMAIL_DUPLICATED);
+        }
+
+        admin.updateProfile(request.name(), request.email(), request.callNumber());
+    }
+
+    @Transactional
+    public void changeRole(Long adminId, AdminRole role) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        admin.changeRole(role);
+    }
+
+    @Transactional
+    public void changeStatus(Long adminId, AdminStatus status) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        admin.changeStatus(status);
+    }
+
+    @Transactional
+    public void deleteAdmin(Long adminId) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        adminRepository.delete(admin);
+    }
 }
