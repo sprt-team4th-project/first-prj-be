@@ -1,10 +1,12 @@
 package com.example.commercepilot.admin.service;
 
+import com.example.commercepilot.admin.dto.request.AdminModifyRequest;     // ✅ 추가
 import com.example.commercepilot.admin.dto.request.AdminPasswordChangeRequest;
 import com.example.commercepilot.admin.dto.request.AdminSignupRequest;
 import com.example.commercepilot.admin.dto.request.AdminUpdateRequest;
 import com.example.commercepilot.admin.dto.response.AdminSignupResponse;
 import com.example.commercepilot.admin.entity.Admin;
+import com.example.commercepilot.admin.entity.AdminRole;                 // ✅ 추가
 import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.config.PasswordEncoder;
@@ -49,7 +51,6 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -63,7 +64,6 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -106,7 +106,6 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        // 이메일 중복 검증(권장)
         if (!admin.getEmail().equals(request.email()) && adminRepository.existsByEmail(request.email())) {
             throw new CustomException(ErrorCode.ADMIN_EMAIL_DUPLICATED);
         }
