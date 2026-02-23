@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminCommandService {
 
     private final AdminRepository adminRepository;
@@ -48,6 +49,7 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
+        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -61,6 +63,7 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
+        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -68,7 +71,6 @@ public class AdminCommandService {
         admin.changeStatus(AdminStatus.REJECTED);
     }
 
-    @Transactional(readOnly = true)
     public AdminSignupResponse getMyProfile(Long adminId) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
@@ -91,11 +93,11 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        if (!passwordEncoder.matches(request.currentPassword(), admin.getPassword())) {
-            throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
-        }
-
-        String encoded = passwordEncoder.encode(request.newPassword());
-        admin.changePassword(encoded);
+        admin.changePasswordWithValidation(
+                passwordEncoder,
+                request.currentPassword(),
+                request.newPassword(),
+                request.newPasswordConfirm()
+        );
     }
 }

@@ -10,5 +10,8 @@ public record AdminPasswordChangeRequest(
 
         @Size(min = 8, message = "새 비밀번호는 최소 8자 이상이어야 합니다.")
         @NotBlank(message = "새 비밀번호는 필수입니다.")
-        String newPassword
+        String newPassword,
+
+        @NotBlank(message = "새 비밀번호 확인은 필수입니다.")
+                String newPasswordConfirm
 ) {}
