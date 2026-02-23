@@ -37,17 +37,17 @@ public class ProductController {
                 (ApiResponse.success(HttpStatus.OK, productCommandService.updateProduct(sessionAdmin, request, productId)));
     }
 
-    @GetMapping("/{productId}") // 상품 단건 조회
-    public ResponseEntity<ApiResponse<ProductDetailResponse>> getProduct(
+    @GetMapping("/{productId}") // 상품 상세 조회
+    public ResponseEntity<ApiResponse<ProductDetailResponse>> getProductDetail(
             @PathVariable Long productId) {
-        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, productQueryService.getProduct(productId)));
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK, productQueryService.getProductDetail(productId)));
     }
 
     @GetMapping // 상품 전체 조회
-    public ResponseEntity<ApiResponse<Page<ProductListResponse>>> getProducts(
+    public ResponseEntity<ApiResponse<Page<ProductListResponse>>> getProductList(
             @Valid @ModelAttribute ProductSearchRequest request) {
         return ResponseEntity.ok(
-                ApiResponse.success(HttpStatus.OK, productQueryService.getProducts(request)));
+                ApiResponse.success(HttpStatus.OK, productQueryService.getProductList(request)));
     }
 
     @DeleteMapping("/{productId}") // 상품 단건 삭제
@@ -64,7 +64,7 @@ public class ProductController {
             @PathVariable Long productId,
             @RequestBody StockChangeRequest request) {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK,
-                productCommandService.changeStock(sessionAdmin, productId, request.newStock())));
+                productCommandService.updateStock(sessionAdmin, productId, request.newStock())));
     }
 
     @PatchMapping("/{productId}/stock/increase") // 기존 재고 추가
@@ -90,8 +90,8 @@ public class ProductController {
             @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin,
             @PathVariable Long productId
     ) {
-        productCommandService.discontinueProduct(sessionAdmin, productId);
-        return ResponseEntity.noContent().build();
+        productCommandService.discontinuedProduct(sessionAdmin, productId);
+        return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK));
     }
 }
 

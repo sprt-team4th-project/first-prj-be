@@ -6,7 +6,6 @@ import com.example.commercepilot.config.BaseEntity;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -51,14 +50,20 @@ public class Product extends BaseEntity {
         this.admin = admin;
     }
 
-    // 수정 가능한 필드: "상품명, 카테고리, 가격, 재고"
-    public void updateProduct(String productName, Category category, Long price) {
-        this.productName = productName;
-        this.category = category;
-        this.price = price;
+    // 수정 가능한 필드: "상품명, 카테고리, 가격"
+    public void updateProductName(String newProductName) {
+        this.productName = newProductName;
     }
 
-    public void changeStock(int newstock) {
+    public void updateCategory(Category category) {
+        this.category = category;
+    }
+
+    public void updatePrice(Long updatePrice) {
+        this.price = updatePrice;
+    }
+
+    public void updateStock(int newstock) {
         if (this.status == ProductStatus.DISCONTINUED) {
             throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
         }
@@ -71,6 +76,8 @@ public class Product extends BaseEntity {
 
     // 재고 추가 메서드
     public void increaseStock(int amount) {
+
+        // 단종처리상태인 상품 재고 추가 불가
         if (this.status == ProductStatus.DISCONTINUED) {
             throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
         }
@@ -86,7 +93,7 @@ public class Product extends BaseEntity {
         if (this.status == ProductStatus.DISCONTINUED) {
             throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
         }
-        // 감소요청이 0보다 작거나 같을 경우 예외처리(증감수량은 1이상이어야해)
+        // 감소요청이 0보다 작거나 같을 경우 예외처리
         if (amount <= 0) {
             throw new CustomException(ErrorCode.INVALID_STOCK_AMOUNT);
         }
@@ -115,19 +122,8 @@ public class Product extends BaseEntity {
         }
     }
 
-    public void updateProductName(String newProductName) {
-        this.productName = newProductName;
-    }
-
-    public void changeCategory(Category category) {
-        this.category = category;
-    }
-
-    public void changePrice(Long updatePrice) {
-        this.price = updatePrice;
-    }
-
-    public void disontinue() {
+    // 단종상태 처리
+    public void disontinued() {
         this.status = ProductStatus.DISCONTINUED;
 
     }

@@ -19,7 +19,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-@Transactional(readOnly = true)
+@Transactional
 @Service
 @RequiredArgsConstructor
 //쓰기전용
@@ -29,7 +29,6 @@ public class ProductCommandService {
     private final AdminRepository adminRepository;
     private final ProductRepository productRepository;
 
-    @Transactional
     public ProductCreateResponse createProduct(SessionAdmin sessionAdmin, ProductCreateRequest request) {
 
         // 로그인 인증
@@ -63,8 +62,6 @@ public class ProductCommandService {
         return ProductCreateResponse.from(savedProduct);
     }
 
-    @Transactional
-
     public ProductUpdateResponse updateProduct(SessionAdmin sessionAdmin, ProductUpdateRequest request, Long productId) {
 
         if (sessionAdmin == null) {
@@ -94,7 +91,7 @@ public class ProductCommandService {
             Category category = categoryRepository.findById(changeCategoryId)
                     .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
-            product.changeCategory(category);
+            product.updateCategory(category);
         }
 
         Long updatePrice = request.price();
@@ -102,14 +99,13 @@ public class ProductCommandService {
             if (updatePrice < 0) {
                 throw new CustomException(ErrorCode.INVALID_PRODUCT_PRICE);
             }
-            product.changePrice(updatePrice);
+            product.updatePrice(updatePrice);
         }
 
         return ProductUpdateResponse.from(product);
 
     }
 
-    @Transactional
     public void deleteProduct(SessionAdmin sessionAdmin, Long productId) {
         if (sessionAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -127,8 +123,7 @@ public class ProductCommandService {
         productRepository.deleteById(productId);
     }
 
-    @Transactional
-    public StockChangeResponse changeStock(SessionAdmin sessionAdmin, Long productId, int newStock) {
+    public StockChangeResponse updateStock(SessionAdmin sessionAdmin, Long productId, int newStock) {
         // 로그인 인증
         if (sessionAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -144,19 +139,17 @@ public class ProductCommandService {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        product.changeStock(newStock);
+        product.updateStock(newStock);
 
         return StockChangeResponse.from(product);
     }
 
-    @Transactional
     public StockChangeResponse increaseStock(SessionAdmin sessionAdmin, Long productId, int amount) {
-        // 로그인 인증
+
         if (sessionAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
-        // 관리자 존재 검증
         adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
                 () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
@@ -171,7 +164,6 @@ public class ProductCommandService {
         return StockChangeResponse.from(product);
     }
 
-    @Transactional
     public StockChangeResponse decreaseStock(SessionAdmin sessionAdmin, Long productId, int amount) {
 
         if (sessionAdmin == null) {
@@ -192,8 +184,7 @@ public class ProductCommandService {
         return StockChangeResponse.from(product);
     }
 
-    @Transactional
-    public void discontinueProduct(SessionAdmin sessionAdmin, Long productId) {
+    public void discontinuedProduct(SessionAdmin sessionAdmin, Long productId) {
 
         if (sessionAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -208,7 +199,7 @@ public class ProductCommandService {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
-        product.disontinue();
+        product.disontinued();
 
 
     }

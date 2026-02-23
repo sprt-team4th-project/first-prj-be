@@ -1,5 +1,6 @@
 package com.example.commercepilot.product.dto.response;
 
+import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.product.entity.Product;
 import lombok.Builder;
 
@@ -21,6 +22,10 @@ public record ProductDetailResponse(
         String adminEmail) {
 
     public static ProductDetailResponse from(Product product) {
+
+        // getAdmin() 중복 호출 피하기 위해 변수로 분리
+        Admin admin = product.getAdmin();
+
         return ProductDetailResponse.builder()
                 .id(product.getId())
                 .productName(product.getProductName())
@@ -29,8 +34,8 @@ public record ProductDetailResponse(
                 .stock(product.getStock())
                 .status(product.getStatus().getLabel())
                 .createdAt(product.getCreatedAt())
-                .adminName(product.getAdmin().getAdminName())
-                .adminEmail(product.getAdmin().getEmail())
+                .adminName(admin.getAdminName())
+                .adminEmail(admin.getEmail())
                 .build();
     }
 }
