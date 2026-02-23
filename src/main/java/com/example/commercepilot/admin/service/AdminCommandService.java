@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminCommandService {
 
     private final AdminRepository adminRepository;
@@ -48,6 +49,7 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
+        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -61,6 +63,7 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
+        // NOTE: PENDING이 아닌 경우에 대한 전용 ErrorCode가 있으면 더 적절함 (예: ADMIN_NOT_PENDING)
         if (admin.getStatus() != AdminStatus.PENDING) {
             throw new CustomException(ErrorCode.ADMIN_LOGIN_NOT_ACTIVE);
         }
@@ -68,7 +71,6 @@ public class AdminCommandService {
         admin.changeStatus(AdminStatus.REJECTED);
     }
 
-    @Transactional(readOnly = true)
     public AdminSignupResponse getMyProfile(Long adminId) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
@@ -91,8 +93,19 @@ public class AdminCommandService {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
+        // 1) 현재 비밀번호 검증
         if (!passwordEncoder.matches(request.currentPassword(), admin.getPassword())) {
             throw new CustomException(ErrorCode.PASSWORD_MISMATCH);
+        }
+
+        // 2) 새 비밀번호 확인값 검증
+        if (!request.newPassword().equals(request.newPasswordConfirm())) {
+            throw new CustomException(ErrorCode.NEW_PASSWORD_CONFIRM_MISMATCH);
+        }
+
+        // 3) 기존 비밀번호와 동일한 새 비밀번호 방지
+        if (passwordEncoder.matches(request.newPassword(), admin.getPassword())) {
+            throw new CustomException(ErrorCode.ALREADY_USED_PASSWORD);
         }
 
         String encoded = passwordEncoder.encode(request.newPassword());

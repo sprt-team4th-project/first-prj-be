@@ -11,6 +11,8 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "A002", "입력값이 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A003", "로그인이 필요한 기능입니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "A004", "권한이 없습니다."),
+    ALREADY_USED_PASSWORD(HttpStatus.BAD_REQUEST, "A005", "이미 사용 중인 비밀번호입니다."),
+    NEW_PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "A006", "새 비밀번호 확인이 일치하지 않습니다."),
 
 //    일정 관련 에러 코드("S###")
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 일정은 존재하지 않습니다."),

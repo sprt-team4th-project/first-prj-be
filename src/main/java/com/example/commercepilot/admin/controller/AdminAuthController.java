@@ -4,7 +4,6 @@ import com.example.commercepilot.admin.config.SessionConst;
 import com.example.commercepilot.admin.dto.request.AdminLoginRequest;
 import com.example.commercepilot.admin.dto.request.AdminPasswordChangeRequest;
 import com.example.commercepilot.admin.dto.request.AdminSignupRequest;
-import com.example.commercepilot.admin.dto.request.AdminUpdateRequest;
 import com.example.commercepilot.admin.dto.response.AdminSignupResponse;
 import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.admin.service.AdminAuthService;
@@ -17,6 +16,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.SessionAttribute;
 
 @RestController
 @RequiredArgsConstructor
@@ -44,50 +44,16 @@ public class AdminAuthController {
         return ApiResponse.success(HttpStatus.OK);
     }
 
-    @GetMapping("/me")
-    public ApiResponse<AdminSignupResponse> getMyProfile(HttpSession session) {
-
-        LoginAdmin loginAdmin = (LoginAdmin) session.getAttribute(SessionConst.LOGIN_ADMIN);
-
-        if (loginAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
-        return ApiResponse.success(HttpStatus.OK,
-                adminCommandService.getMyProfile(loginAdmin.adminId()));
-    }
-
-    @PatchMapping("/me")
-    public ApiResponse<Void> updateMyProfile(
-            @Valid @RequestBody AdminUpdateRequest request,
-            HttpSession session
-    ) {
-
-        LoginAdmin loginAdmin = (LoginAdmin) session.getAttribute(SessionConst.LOGIN_ADMIN);
-
-        if (loginAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
-        adminCommandService.updateMyProfile(loginAdmin.adminId(), request);
-
-        return ApiResponse.success(HttpStatus.OK);
-    }
-
     @PatchMapping("/me/password")
     public ApiResponse<Void> changePassword(
             @Valid @RequestBody AdminPasswordChangeRequest request,
-            HttpSession session
+            @SessionAttribute(name = SessionConst.LOGIN_ADMIN, required = false) LoginAdmin loginAdmin
     ) {
-
-        LoginAdmin loginAdmin = (LoginAdmin) session.getAttribute(SessionConst.LOGIN_ADMIN);
-
         if (loginAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
         adminCommandService.changePassword(loginAdmin.adminId(), request);
-
         return ApiResponse.success(HttpStatus.OK);
     }
 }
