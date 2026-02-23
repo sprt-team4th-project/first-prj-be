@@ -17,11 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class AdminQueryService {
 
     private final AdminRepository adminRepository;
 
-    @Transactional(readOnly = true)
     public Page<AdminListResponse> search(AdminSearchCondition condition, Pageable pageable) {
 
         Specification<Admin> spec = Specification.where(AdminSpecifications.keyword(condition.keyword()))
@@ -31,7 +31,6 @@ public class AdminQueryService {
         return adminRepository.findAll(spec, pageable).map(AdminListResponse::from);
     }
 
-    @Transactional(readOnly = true)
     public AdminDetailResponse getDetail(Long adminId) {
         Admin admin = adminRepository.findById(adminId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));

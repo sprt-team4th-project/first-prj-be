@@ -6,6 +6,7 @@ import com.example.commercepilot.admin.dto.response.AdminDetailResponse;
 import com.example.commercepilot.admin.dto.response.AdminListResponse;
 import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.admin.entity.AdminRole;
+import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.service.AdminQueryService;
 import com.example.commercepilot.exception.ApiResponse;
 import com.example.commercepilot.exception.CustomException;
@@ -26,15 +27,11 @@ public class AdminManagementController {
 
     @GetMapping
     public ApiResponse<Page<AdminListResponse>> searchAdmins(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) AdminRole role,
-            @RequestParam(required = false) com.example.commercepilot.admin.entity.AdminStatus status,
+            @ModelAttribute AdminSearchCondition condition,
             Pageable pageable,
             HttpSession session
     ) {
         requireSuperAdmin(session);
-
-        AdminSearchCondition condition = new AdminSearchCondition(keyword, role, status);
         return ApiResponse.success(HttpStatus.OK, adminQueryService.search(condition, pageable));
     }
 
@@ -49,7 +46,7 @@ public class AdminManagementController {
 
     private void requireSuperAdmin(HttpSession session) {
         // TODO: SuperAdmin 세션 로그인 구현되면 아래 키로 체크 가능
-        Object superAdmin = session.getAttribute("LOGIN_SUPER_ADMIN");
+        Object superAdmin = session.getAttribute(SessionConst.LOGIN_SUPER_ADMIN);
         if (superAdmin != null) return;
 
         LoginAdmin loginAdmin = (LoginAdmin) session.getAttribute(SessionConst.LOGIN_ADMIN);
