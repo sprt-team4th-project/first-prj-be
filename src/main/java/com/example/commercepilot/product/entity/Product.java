@@ -6,6 +6,7 @@ import com.example.commercepilot.config.BaseEntity;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -13,11 +14,12 @@ import org.hibernate.annotations.SoftDelete;
 
 @Getter
 @Entity
-@Table(name= "products")
+@Table(name = "products")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @SoftDelete(columnName = "is_deleted")
 public class Product extends BaseEntity {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // 고유 id
 
     @Column(nullable = false, unique = true, length = 50)
@@ -32,12 +34,12 @@ public class Product extends BaseEntity {
     @Column(nullable = false)
     private ProductStatus status; // 상태(판매중, 품절, 단종)
 
-    @ManyToOne(fetch = FetchType.LAZY,optional = false)
-    @JoinColumn(name = "admin_id",nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "admin_id", nullable = false)
     private Admin admin; // 상품 관련 관리자 연관관계
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "category_id",nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category; // 상품 관련 카테고리 연관관계
 
     public Product(String productName, Long price, int stock, ProductStatus status, Category category, Admin admin) {
@@ -48,6 +50,7 @@ public class Product extends BaseEntity {
         this.category = category;
         this.admin = admin;
     }
+
     // 수정 가능한 필드: "상품명, 카테고리, 가격, 재고"
     public void updateProduct(String productName, Category category, Long price) {
         this.productName = productName;
@@ -56,20 +59,33 @@ public class Product extends BaseEntity {
     }
 
     public void changeStock(int newstock) {
+        if (this.status == ProductStatus.DISCONTINUED) {
+            throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
+        }
+        if (newstock < 0) {
+            throw new CustomException(ErrorCode.INVALID_STOCK_AMOUNT);
+        }
         this.stock = newstock;
         updateStatusByStock();
     }
+
     // 재고 추가 메서드
     public void increaseStock(int amount) {
+        if (this.status == ProductStatus.DISCONTINUED) {
+            throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
+        }
         if (amount <= 0) {
             throw new CustomException(ErrorCode.INVALID_STOCK_AMOUNT);
         }
-            this.stock += amount;
+        this.stock += amount;
         updateStatusByStock();
     }
 
     // 재고 감소 메서드
     public void decreaseStock(int amount) {
+        if (this.status == ProductStatus.DISCONTINUED) {
+            throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
+        }
         // 감소요청이 0보다 작거나 같을 경우 예외처리(증감수량은 1이상이어야해)
         if (amount <= 0) {
             throw new CustomException(ErrorCode.INVALID_STOCK_AMOUNT);
@@ -78,7 +94,7 @@ public class Product extends BaseEntity {
         if (this.stock - amount < 0) {
             throw new CustomException(ErrorCode.INSUFFICIENT_STOCK);
         }
-            this.stock -= amount;
+        this.stock -= amount;
         updateStatusByStock();
     }
 
@@ -90,7 +106,7 @@ public class Product extends BaseEntity {
             return;
         }
         // 재고가 0보다 작거나 같으면 품절
-        if(this.stock <= 0) {
+        if (this.stock <= 0) {
             this.status = ProductStatus.SOLD_OUT;
         }
         // 아니면 판매중
@@ -99,4 +115,20 @@ public class Product extends BaseEntity {
         }
     }
 
+    public void updateProductName(String newProductName) {
+        this.productName = newProductName;
+    }
+
+    public void changeCategory(Category category) {
+        this.category = category;
+    }
+
+    public void changePrice(Long updatePrice) {
+        this.price = updatePrice;
+    }
+
+    public void disontinue() {
+        this.status = ProductStatus.DISCONTINUED;
+
+    }
 }

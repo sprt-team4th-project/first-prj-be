@@ -1,5 +1,6 @@
 package com.example.commercepilot.exception;
 
+import com.example.commercepilot.category.entity.Category;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -31,6 +32,10 @@ public enum ErrorCode {
     PRODUCT_SOLD_OUT(HttpStatus.BAD_REQUEST, "P002", "품절된 상품입니다."),
     INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "P003", "재고가 부족합니다."),
     INVALID_STOCK_AMOUNT(HttpStatus.BAD_REQUEST, "P004", "재고 증감 수량은 1 이상이어야 합니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P005", "해당 상품을 찾을 수 없습니다."),
+    INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, "P006", "가격은 0 이상이어야 합니다."),
+    PRODUCT_NAME_BLANK(HttpStatus.BAD_REQUEST, "P007", "상품명은 공백일 수 없습니다."),
+
 
     // 고객 관련 에러 코드("CU###")
     CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
@@ -50,7 +55,10 @@ public enum ErrorCode {
     // 주문 관련 에러 코드("O###")
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "해당 주문을 찾을 수 없습니다."),
     ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "O002", "취소할 수 없는 주문입니다."),
-    ORDER_STATUS_NOT_CHANGEABLE(HttpStatus.BAD_REQUEST, "O003", "변경할 수 없는 주문 상태입니다.");
+    ORDER_STATUS_NOT_CHANGEABLE(HttpStatus.BAD_REQUEST, "O003", "변경할 수 없는 주문 상태입니다."),
+
+    // 카테고리 관련 에러 코드("CA###")
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CA001", "해당 카테고리를 찾을 수 없습니다.");
 
     private final HttpStatus status;
     private final String code;

@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 public record ProductUpdateResponse(
         Long id,
         String productName,
+        Long categoryId,
         String category,
         Long price,
         LocalDateTime createAt,
@@ -18,6 +19,7 @@ public record ProductUpdateResponse(
         return new ProductUpdateResponse(
                 product.getId(),
                 product.getProductName(),
+                product.getCategory().getId(),
                 product.getCategory().getName(),
                 product.getPrice(),
                 product.getCreatedAt(),
