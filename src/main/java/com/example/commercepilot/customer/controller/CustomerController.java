@@ -1,16 +1,17 @@
 package com.example.commercepilot.customer.controller;
 
+import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.customer.dto.request.CustomerStatusRequest;
 import com.example.commercepilot.customer.dto.request.CustomerUpdateRequest;
 import com.example.commercepilot.customer.dto.response.CustomerDeleteResponse;
 import com.example.commercepilot.customer.dto.response.CustomerStatusResponse;
 import com.example.commercepilot.customer.dto.response.CustomerUpdateResponse;
+import com.example.commercepilot.customer.dto.session.LoginCustomer;
 import com.example.commercepilot.customer.service.CustomerService;
 import com.example.commercepilot.exception.ApiResponse;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
-import com.example.commercepilot.orders.dto.session.SessionAdmin;
-import com.example.commercepilot.orders.dto.session.SessionCustomer;
+
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -28,13 +29,13 @@ public class CustomerController {
     @PatchMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerUpdateResponse>> updateCustomer(
             @PathVariable Long customerId,
-            @SessionAttribute(name = "loginCustomer", required = false) SessionCustomer sessionCustomer,
+            @SessionAttribute(name = "loginCustomer", required = false) LoginCustomer loginCustomer,
             @Valid @RequestBody CustomerUpdateRequest request
     ) {
-        if (sessionCustomer == null) {
+        if (loginCustomer == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-        if (!sessionCustomer.customerId().equals(customerId)) {
+        if (!loginCustomer.customerId().equals(customerId)) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
         return ResponseEntity.ok(
@@ -45,10 +46,10 @@ public class CustomerController {
     @PatchMapping("/{customerId}/status")
     public ResponseEntity<ApiResponse<CustomerStatusResponse>> updateStatus(
             @PathVariable Long customerId,
-            @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin,
+            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
             @Valid @RequestBody CustomerStatusRequest request
     ) {
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         return ResponseEntity.ok(
@@ -59,9 +60,9 @@ public class CustomerController {
     @DeleteMapping("/{customerId}")
     public ResponseEntity<ApiResponse<CustomerDeleteResponse>> deleteCustomer(
             @PathVariable Long customerId,
-            @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin
+            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin
     ) {
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         return ResponseEntity.ok(

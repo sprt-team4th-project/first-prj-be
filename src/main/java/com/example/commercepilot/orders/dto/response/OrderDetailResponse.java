@@ -24,9 +24,9 @@ public class OrderDetailResponse {
 
     private OrderDetailResponse(Order order) {
         this.orderNumber = order.getOrderNumber();
-        this.customerName = order.getCustomer().getName();
+        this.customerName = order.getCustomer().getCustomerName();
         this.customerEmail = order.getCustomer().getEmail();
-        this.productName = order.getProduct().getName();
+        this.productName = order.getProduct().getProductName();
         this.quantity = order.getQuantity();
         this.totalPrice = order.getTotalPrice();
         this.orderedAt = order.getCreatedAt();

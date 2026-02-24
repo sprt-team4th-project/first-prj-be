@@ -1,5 +1,6 @@
 package com.example.commercepilot.category.controller;
 
+import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.category.dto.request.CategoryCreateRequest;
 import com.example.commercepilot.category.dto.request.CategoryUpdateRequest;
 import com.example.commercepilot.category.dto.response.CategoryCreateResponse;
@@ -10,7 +11,6 @@ import com.example.commercepilot.category.service.CategoryService;
 import com.example.commercepilot.exception.ApiResponse;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
-import com.example.commercepilot.orders.dto.session.SessionAdmin;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -34,10 +34,10 @@ public class CategoryController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CategoryCreateResponse>> createCategory(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
             @Valid @RequestBody CategoryCreateRequest request) {
 
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -63,10 +63,10 @@ public class CategoryController {
 
     @GetMapping("/deleted")
     public ResponseEntity<ApiResponse<List<CategoryDeleteResponse>>> getDeletedCategories(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) com.example.commercepilot.admin.dto.session.LoginAdmin loginAdmin,
             @RequestParam(name = "status") HttpStatus status) {
 
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -76,11 +76,11 @@ public class CategoryController {
 
     @PutMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
             @PathVariable Long categoryId,
             @Valid @RequestBody CategoryUpdateRequest request) {
 
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -90,10 +90,10 @@ public class CategoryController {
 
     @PutMapping("/{categoryId}/restore")
     public ResponseEntity<ApiResponse<Void>> restoreCategory(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
             @PathVariable Long categoryId) {
 
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -103,10 +103,10 @@ public class CategoryController {
 
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryDeleteResponse>> deleteCategory(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
             @PathVariable Long categoryId) {
 
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
 
