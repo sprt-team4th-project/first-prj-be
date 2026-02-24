@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admins")
+@RequestMapping("/api/admins")
 public class AdminAuthController {
 
     private final AdminCommandService adminCommandService;

@@ -22,7 +22,7 @@ import static com.example.commercepilot.admin.config.SessionConst.LOGIN_ADMIN;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/orders")
+@RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderQueryService orderQueryService;
