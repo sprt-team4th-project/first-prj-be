@@ -2,6 +2,7 @@ package com.example.commercepilot.orders.entity;
 
 import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.config.BaseEntity;
+import com.example.commercepilot.customer.entity.Customer;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
@@ -9,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
-
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
