@@ -10,7 +10,6 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
-
 @Getter
 @Entity
 @Table(name = "products")
@@ -50,17 +49,25 @@ public class Product extends BaseEntity {
         this.admin = admin;
     }
 
-    // 수정 가능한 필드: "상품명, 카테고리, 가격"
-    public void updateProductName(String newProductName) {
-        this.productName = newProductName;
-    }
+    public void updateProduct(String productName, Long price, Category category) {
 
-    public void updateCategory(Category category) {
-        this.category = category;
-    }
+        if (productName != null) {
+            if (productName.isBlank()) {
+                throw new CustomException(ErrorCode.PRODUCT_NAME_BLANK);
+            }
+            this.productName = productName;
+        }
 
-    public void updatePrice(Long updatePrice) {
-        this.price = updatePrice;
+        if (category != null) {
+            this.category = category;
+        }
+
+        if (price != null) {
+            if (price < 0) {
+                throw new CustomException(ErrorCode.INVALID_PRODUCT_PRICE);
+            }
+            this.price = price;
+        }
     }
 
     public void updateStock(int newStock) {
@@ -125,27 +132,5 @@ public class Product extends BaseEntity {
     // 단종상태 처리
     public void disontinued() {
         this.status = ProductStatus.DISCONTINUED;
-
-    }
-
-    public void updateProduct(String productName, Long price, Category category) {
-
-        if (productName != null) {
-            if (productName.isBlank()) {
-                throw new CustomException(ErrorCode.PRODUCT_NAME_BLANK);
-            }
-            this.productName = productName;
-        }
-
-        if (category != null) {
-            this.category = category;
-        }
-
-        if (price != null) {
-            if (price < 0) {
-                throw new CustomException(ErrorCode.INVALID_PRODUCT_PRICE);
-            }
-            this.price = price;
-        }
     }
 }

@@ -26,7 +26,7 @@ import java.util.List;
 import static com.example.commercepilot.admin.config.SessionConst.LOGIN_ADMIN;
 
 @RestController
-@RequestMapping("/categories")
+@RequestMapping("/api/categories")
 @RequiredArgsConstructor
 public class CategoryController {
 
