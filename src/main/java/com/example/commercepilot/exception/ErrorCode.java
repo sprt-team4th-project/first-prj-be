@@ -11,9 +11,35 @@ public enum ErrorCode {
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "A002", "입력값이 올바르지 않습니다."),
     UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "A003", "로그인이 필요한 기능입니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN, "A004", "권한이 없습니다."),
+    ALREADY_USED_PASSWORD(HttpStatus.BAD_REQUEST, "A005", "이미 사용 중인 비밀번호입니다."),
+    NEW_PASSWORD_CONFIRM_MISMATCH(HttpStatus.BAD_REQUEST, "A006", "새 비밀번호 확인이 일치하지 않습니다."),
 
 //    일정 관련 에러 코드("S###")
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 일정은 존재하지 않습니다."),
+
+//    관리자 관련 에러 코드("M###")
+    ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "M001", "이미 사용 중인 이메일입니다."),
+    ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "해당 관리자는 존재하지 않습니다."),
+    ADMIN_LOGIN_NOT_ACTIVE(HttpStatus.FORBIDDEN, "M003", "활성 상태의 관리자만 로그인할 수 있습니다."),
+    ADMIN_PENDING(HttpStatus.FORBIDDEN, "M004", "승인대기 상태입니다."),
+    ADMIN_REJECTED(HttpStatus.FORBIDDEN, "M005", "가입 신청이 거부된 계정입니다."),
+    ADMIN_SUSPENDED(HttpStatus.FORBIDDEN, "M006", "정지된 계정입니다."),
+    ADMIN_INACTIVE(HttpStatus.FORBIDDEN, "M007", "비활성화된 계정입니다."),
+
+//    상품 관련 에러 코드("P###")
+    PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "P001", "단종된 상품입니다."),
+    PRODUCT_SOLD_OUT(HttpStatus.BAD_REQUEST, "P002", "품절된 상품입니다."),
+    INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "P003", "재고가 부족합니다."),
+    INVALID_STOCK_AMOUNT(HttpStatus.BAD_REQUEST, "P004", "재고 증감 수량은 1 이상이어야 합니다."),
+    PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND, "P005", "해당 상품을 찾을 수 없습니다."),
+    INVALID_PRODUCT_PRICE(HttpStatus.BAD_REQUEST, "P006", "가격은 0 이상이어야 합니다."),
+    PRODUCT_NAME_BLANK(HttpStatus.BAD_REQUEST, "P007", "상품명은 공백일 수 없습니다."),
+
+
+//    고객 관련 에러 코드("CU###")
+    CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
+    CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CU002", "해당 고객을 찾을 수 없습니다."),
+    CUSTOMER_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "CU003", "이미 사용 중인 이메일입니다."),
 
 //    유저 관련 에러 코드("U###")
     USER_NOT_FOUND(HttpStatus.NOT_FOUND, "U001", "해당 유저는 존재하지 않습니다"),
@@ -23,7 +49,18 @@ public enum ErrorCode {
     COMMENT_NOT_IN_SCHEDULE(HttpStatus.NOT_FOUND, "C002", "해당 일정에 속한 댓글이 아닙니다."),
 
 //    로그인 관련 에러 코드("L###")
-    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다.");
+    LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다."),
+
+//    주문 관련 에러 코드("O###")
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "해당 주문을 찾을 수 없습니다."),
+    ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "O002", "취소할 수 없는 주문입니다."),
+    ORDER_STATUS_NOT_CHANGEABLE(HttpStatus.BAD_REQUEST, "O003", "변경할 수 없는 주문 상태입니다."),
+
+//    카테고리 관련 에러 코드("CA###")
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CA001", "해당 카테고리는 존재하지 않습니다."),
+    SELF_REFERENCE_CATEGORY(HttpStatus.BAD_REQUEST, "CA002", "자신을 부모 카테고리로 가질 수 없습니다."),
+    CIRCULAR_CATEGORY_REFERENCE(HttpStatus.BAD_REQUEST, "CA003", "자식이 부모가 되는 참조를 만들 수 없습니다."),
+    DUPLICATE_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "CA004", "해당 카테고리명은 이미 존재합니다.");
 
     private final HttpStatus status;
     private final String code;
