@@ -19,7 +19,7 @@ public class ProductSearchRequest {
     private ProductStatus productStatus;
 
     // 페이지 번호(기본값: 1)
-    @Min( value = 1, message ="페이지 번호는 1 이상이어야 합니다.")
+    @Min(value = 1, message ="페이지 번호는 1 이상이어야 합니다.")
     private int page = 1;
 
     // 페이지당 개수(기본값: 10)
