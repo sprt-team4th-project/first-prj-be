@@ -12,7 +12,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SoftDelete;
 
-
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.UUID;

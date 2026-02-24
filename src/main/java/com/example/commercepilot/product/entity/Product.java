@@ -19,7 +19,7 @@ import org.hibernate.annotations.SoftDelete;
 public class Product extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id; // 고유 id
+    private Long id; // 고유 categoryId
 
     @Column(nullable = false, unique = true, length = 50)
     private String productName; // 상품명

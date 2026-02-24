@@ -1,18 +1,21 @@
 package com.example.commercepilot.category.entity;
 
 import com.example.commercepilot.config.BaseEntity;
+import com.example.commercepilot.exception.CustomException;
+import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.SoftDelete;
+import org.hibernate.annotations.SQLRestriction;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @Entity
-@SoftDelete(columnName = "is_deleted")
+@SQLRestriction("is_deleted = false")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Category extends BaseEntity {
 
@@ -23,7 +26,10 @@ public class Category extends BaseEntity {
     @Column(unique = true, nullable = false)
     private String name;
 
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
+
+    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
@@ -32,40 +38,59 @@ public class Category extends BaseEntity {
     @OneToMany(mappedBy = "parent", cascade = CascadeType.ALL)
     private List<Category> children = new ArrayList<>();
 
-    public Category(String name) {
+    public Category(String name, Category parent) {
         this.name = name;
+        changeParent(parent);
     }
 
-    // 편의 메서드
-    public void addChildCategory(Category child) {
-        if (!this.children.contains(child)) {
-            this.children.add(child);
+    public void changeParent(Category parent) {
+        if (parent != null && parent.getId().equals(this.id)) {
+            throw new CustomException(ErrorCode.SELF_REFERENCE_CATEGORY);
         }
-
-        if (child.getParent() != this) {
-            child.setParent(this);
+        if (parent != null && isDescendant(parent)) {
+            throw new CustomException(ErrorCode.CIRCULAR_CATEGORY_REFERENCE);
         }
-    }
-
-    public void setParent(Category parent) {
-        // 부모 카테고리가 변경되는 상황을 대비
         if (this.parent != null) {
-            this.parent.getChildren().remove(this);
+            this.parent.children.remove(this);
         }
 
         this.parent = parent;
-
-        if (parent != null && !parent.getChildren().contains(this)) {
-            parent.getChildren().add(this);
+        if (parent != null) {
+            parent.children.add(this);
         }
     }
 
-    public void deleteChildCategory() {
-        this.isDeleted = true;
+    private boolean isDescendant(Category category) {
         for (Category child : this.children) {
-            if (!child.isDeleted()) {
-                child.deleteChildCategory();
+            if (child.getId().equals(category.getId())) {
+                return true;
+            }
+            if (child.isDescendant(category)) {
+                return true;
             }
         }
+        return false;
+    }
+
+    public void rename(String name) {
+        if (name == null || name.isBlank()) {
+            throw new CustomException(ErrorCode.INVALID_INPUT_VALUE);
+        }
+        this.name = name;
+    }
+
+    public void deleteWithDescendants() {
+        this.isDeleted = true;
+        this.deletedAt = LocalDateTime.now();
+        for (Category child : this.children) {
+            if (!child.isDeleted()) {
+                child.deleteWithDescendants();
+            }
+        }
+    }
+
+    public void restore() {
+        this.isDeleted = false;
+        this.deletedAt = null;
     }
 }
