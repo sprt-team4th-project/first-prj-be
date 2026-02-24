@@ -22,13 +22,13 @@ public class OrderListResponse {
     private OrderListResponse(Order order) {
         this.id = order.getId();
         this.orderNumber = order.getOrderNumber();
-        this.customerName = order.getCustomer().getName();
-        this.productName = order.getProductName();
+        this.customerName = order.getCustomer().getCustomerName();
+        this.productName = order.getProduct().getProductName();
         this.quantity = order.getQuantity();
         this.totalPrice = order.getTotalPrice();
         this.orderedAt = order.getCreatedAt();
         this.status = order.getStatus();
-        this.adminName = order.getAdminName();
+        this.adminName = order.getAdmin().getAdminName();
     }
 
     public static OrderListResponse from(Order order) {
