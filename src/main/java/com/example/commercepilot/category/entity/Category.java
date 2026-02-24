@@ -31,6 +31,9 @@ public class Category extends BaseEntity {
 
     private LocalDateTime deletedAt;
 
+    @Column(name = "parent_id", insertable = false, updatable = false)
+    private Long parentId;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parent_id")
     private Category parent;
