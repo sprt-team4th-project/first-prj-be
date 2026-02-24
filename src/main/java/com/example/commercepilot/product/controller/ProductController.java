@@ -28,7 +28,7 @@ public class ProductController {
                 .body(ApiResponse.success(HttpStatus.CREATED, productCommandService.createProduct(sessionAdmin, request)));
     }
 
-    @PatchMapping("/{productId}") // 상품 수정 (상품명, 카테고리, 가격, 재고)
+    @PatchMapping("/{productId}") // 상품 수정 (상품명, 카테고리, 가격)
     public ResponseEntity<ApiResponse<ProductUpdateResponse>> updateProduct(
             @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin,
             @Valid @RequestBody ProductUpdateRequest request,
@@ -86,11 +86,11 @@ public class ProductController {
     }
 
     @PatchMapping("/{productId}/status/discontinue") // 재고상태 단종으로 변경
-    public ResponseEntity<ApiResponse<Void>> discontinue(
+    public ResponseEntity<ApiResponse<Void>> discontinueProduct(
             @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin,
             @PathVariable Long productId
     ) {
-        productCommandService.discontinuedProduct(sessionAdmin, productId);
+        productCommandService.discontinueProduct(sessionAdmin, productId);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK));
     }
 }

@@ -45,11 +45,9 @@ public class ProductQueryService {
         ).map(ProductListResponse::from);
     }
 
-
     public ProductDetailResponse getProductDetail(Long productId) {
         Product product = productRepository.findById(productId).orElseThrow(
                 () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
         return ProductDetailResponse.from(product);
-
     }
 }

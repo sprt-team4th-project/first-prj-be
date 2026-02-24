@@ -29,24 +29,37 @@ public class ProductCommandService {
     private final AdminRepository adminRepository;
     private final ProductRepository productRepository;
 
-    public ProductCreateResponse createProduct(SessionAdmin sessionAdmin, ProductCreateRequest request) {
-
-        // 로그인 인증
+    // 관리자 권한 및 존재 여부 검증
+    private Admin validateAdmin(SessionAdmin sessionAdmin) {
         if (sessionAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
-
-        // 관리자 존재 검증
         Admin admin = adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
                 () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
         if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
+        return admin;
+    }
 
-        // 카테고리 조회
-        Category category = categoryRepository.findById(request.categoryId())
+    // 삭제/수정 대상 상품 존재 검증
+    private Product validateProduct(Long productId) {
+        return productRepository.findById(productId).orElseThrow(
+                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+    }
+
+    // 요청 카테고리 유효성 검증
+    private Category validateCategory(Long categoryId) {
+        return categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+    }
+
+    public ProductCreateResponse createProduct(SessionAdmin sessionAdmin, ProductCreateRequest request) {
+
+        Admin admin = validateAdmin(sessionAdmin);
+
+        Category category = validateCategory(request.categoryId());
 
         Product product = new Product(
                 request.productName(),
@@ -64,80 +77,33 @@ public class ProductCommandService {
 
     public ProductUpdateResponse updateProduct(SessionAdmin sessionAdmin, ProductUpdateRequest request, Long productId) {
 
-        if (sessionAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        validateAdmin(sessionAdmin);
+
+        Product product = validateProduct(productId);
+
+        Category category = null;
+        if (request.categoryId() != null) {
+            category = validateCategory(request.categoryId());
         }
-        adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-
-        // 존재하는 상품인지 체크
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
-
-        String newProductName = request.productName();
-        if (newProductName != null) { // 이름이 '들어온 경우'에만 검사/수정
-            if (newProductName.isBlank()) { // 들어왔는데 공백이면 = 잘못된 요청
-                throw new CustomException(ErrorCode.PRODUCT_NAME_BLANK);
-            }
-            product.updateProductName(newProductName);
-        }
-
-        Long changeCategoryId = request.categoryId();
-        if (changeCategoryId != null) {
-            Category category = categoryRepository.findById(changeCategoryId)
-                    .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
-
-            product.updateCategory(category);
-        }
-
-        Long updatePrice = request.price();
-        if (updatePrice != null) {
-            if (updatePrice < 0) {
-                throw new CustomException(ErrorCode.INVALID_PRODUCT_PRICE);
-            }
-            product.updatePrice(updatePrice);
-        }
+        product.updateProduct(request.productName(), request.price(), category);
 
         return ProductUpdateResponse.from(product);
-
     }
 
     public void deleteProduct(SessionAdmin sessionAdmin, Long productId) {
-        if (sessionAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-        adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
+        validateAdmin(sessionAdmin);
 
-        productRepository.findById(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        validateProduct(productId);
 
         productRepository.deleteById(productId);
     }
 
     public StockChangeResponse updateStock(SessionAdmin sessionAdmin, Long productId, int newStock) {
-        // 로그인 인증
-        if (sessionAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
 
-        // 관리자 존재 검증
-        adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+        validateAdmin(sessionAdmin);
 
-        if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = validateProduct(productId);
 
         product.updateStock(newStock);
 
@@ -146,18 +112,9 @@ public class ProductCommandService {
 
     public StockChangeResponse increaseStock(SessionAdmin sessionAdmin, Long productId, int amount) {
 
-        if (sessionAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
+        validateAdmin(sessionAdmin);
 
-        adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = validateProduct(productId);
 
         product.increaseStock(amount);
 
@@ -166,38 +123,19 @@ public class ProductCommandService {
 
     public StockChangeResponse decreaseStock(SessionAdmin sessionAdmin, Long productId, int amount) {
 
-        if (sessionAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
+        validateAdmin(sessionAdmin);
 
-        adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = validateProduct(productId);
 
         product.decreaseStock(amount);
 
         return StockChangeResponse.from(product);
     }
 
-    public void discontinuedProduct(SessionAdmin sessionAdmin, Long productId) {
+    public void discontinueProduct(SessionAdmin sessionAdmin, Long productId) {
+        validateAdmin(sessionAdmin);
 
-        if (sessionAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-
-        adminRepository.findById(sessionAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        if (sessionAdmin.role() != AdminRole.OPERATION_ADMIN && sessionAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        Product product = productRepository.findById(productId).orElseThrow(
-                () -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = validateProduct(productId);
 
         product.disontinued();
 

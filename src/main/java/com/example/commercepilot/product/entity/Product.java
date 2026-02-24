@@ -63,14 +63,14 @@ public class Product extends BaseEntity {
         this.price = updatePrice;
     }
 
-    public void updateStock(int newstock) {
+    public void updateStock(int newStock) {
         if (this.status == ProductStatus.DISCONTINUED) {
             throw new CustomException(ErrorCode.PRODUCT_DISCONTINUED);
         }
-        if (newstock < 0) {
+        if (newStock < 0) {
             throw new CustomException(ErrorCode.INVALID_STOCK_AMOUNT);
         }
-        this.stock = newstock;
+        this.stock = newStock;
         updateStatusByStock();
     }
 
@@ -126,5 +126,26 @@ public class Product extends BaseEntity {
     public void disontinued() {
         this.status = ProductStatus.DISCONTINUED;
 
+    }
+
+    public void updateProduct(String productName, Long price, Category category) {
+
+        if (productName != null) {
+            if (productName.isBlank()) {
+                throw new CustomException(ErrorCode.PRODUCT_NAME_BLANK);
+            }
+            this.productName = productName;
+        }
+
+        if (category != null) {
+            this.category = category;
+        }
+
+        if (price != null) {
+            if (price < 0) {
+                throw new CustomException(ErrorCode.INVALID_PRODUCT_PRICE);
+            }
+            this.price = price;
+        }
     }
 }
