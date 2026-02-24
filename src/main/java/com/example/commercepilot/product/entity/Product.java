@@ -132,6 +132,5 @@ public class Product extends BaseEntity {
     // 단종상태 처리
     public void disontinued() {
         this.status = ProductStatus.DISCONTINUED;
-
     }
 }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.SessionAttribute;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admins")
+
 public class AdminAuthController {
 
     private final AdminCommandService adminCommandService;

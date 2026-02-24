@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admins")
+
 public class AdminManagementController {
 
     private final AdminQueryService adminQueryService;
