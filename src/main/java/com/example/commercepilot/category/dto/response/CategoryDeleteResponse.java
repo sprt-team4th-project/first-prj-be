@@ -7,15 +7,15 @@ import java.time.LocalDateTime;
 
 @Builder
 public record CategoryDeleteResponse(
-        Long id,
-        String name,
+        Long categoryId,
+        String categoryName,
         LocalDateTime deletedAt
 ) {
 
     public static CategoryDeleteResponse from(Category category) {
         return CategoryDeleteResponse.builder()
-                .id(category.getId())
-                .name(category.getName())
+                .categoryId(category.getId())
+                .categoryName(category.getName())
                 .deletedAt(category.getDeletedAt())
                 .build();
     }

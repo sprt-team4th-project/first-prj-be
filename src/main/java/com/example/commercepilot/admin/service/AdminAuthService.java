@@ -35,7 +35,7 @@ public class AdminAuthService {
         // 상태별 로그인 차단
         validateLoginStatus(admin.getStatus());
 
-        // 세션 저장 (필수: id/email/role)
+        // 세션 저장 (필수: categoryId/email/role)
         LoginAdmin loginAdmin = new LoginAdmin(admin.getId(), admin.getEmail(), admin.getRole());
         session.setAttribute(SessionConst.LOGIN_ADMIN, loginAdmin);
 

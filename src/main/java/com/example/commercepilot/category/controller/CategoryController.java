@@ -2,7 +2,10 @@ package com.example.commercepilot.category.controller;
 
 import com.example.commercepilot.category.dto.request.CategoryCreateRequest;
 import com.example.commercepilot.category.dto.request.CategoryUpdateRequest;
-import com.example.commercepilot.category.dto.response.*;
+import com.example.commercepilot.category.dto.response.CategoryCreateResponse;
+import com.example.commercepilot.category.dto.response.CategoryDeleteResponse;
+import com.example.commercepilot.category.dto.response.CategoryListResponse;
+import com.example.commercepilot.category.dto.response.CategoryResponse;
 import com.example.commercepilot.category.service.CategoryService;
 import com.example.commercepilot.exception.ApiResponse;
 import com.example.commercepilot.exception.CustomException;
@@ -17,6 +20,8 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 import static com.example.commercepilot.admin.config.SessionConst.LOGIN_ADMIN;
 
@@ -57,9 +62,9 @@ public class CategoryController {
     }
 
     @GetMapping("/deleted")
-    public ResponseEntity<ApiResponse<CategoryDeleteResponse>> deleteCategory(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin
-    ) {
+    public ResponseEntity<ApiResponse<List<CategoryDeleteResponse>>> getDeletedCategories(
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) SessionAdmin sessionAdmin,
+            @RequestParam(name = "status") HttpStatus status) {
 
         if (sessionAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);

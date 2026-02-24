@@ -13,6 +13,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -82,7 +84,11 @@ public class CategoryService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
-    public CategoryDeleteResponse getDeletedCategories() {
-        return null;
+    public List<CategoryDeleteResponse> getDeletedCategories() {
+        List<Category> deletedCategories = categoryRepository.findAllDeleted();
+
+        return deletedCategories.stream()
+                .map(CategoryDeleteResponse::from)
+                .toList();
     }
 }

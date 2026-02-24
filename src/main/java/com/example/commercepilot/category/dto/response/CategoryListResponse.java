@@ -4,15 +4,11 @@ import com.example.commercepilot.category.entity.Category;
 import lombok.Builder;
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
-
 @Builder
 public record CategoryListResponse(
         Long id,
         String categoryName,
-        String parentCategoryName,
-        LocalDateTime createdAt,
-        LocalDateTime modifiedAt
+        String parentCategoryName
 ) {
 
     public static CategoryListResponse from(Category category) {
@@ -22,8 +18,6 @@ public record CategoryListResponse(
                 .parentCategoryName(category.getParent() != null
                         ? category.getParent().getName()
                         : null)
-                .createdAt(category.getCreatedAt())
-                .modifiedAt(category.getModifiedAt())
                 .build();
     }
 
