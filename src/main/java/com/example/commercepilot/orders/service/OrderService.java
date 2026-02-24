@@ -1,8 +1,11 @@
 package com.example.commercepilot.orders.service;
 
+import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.repository.AdminRepository;
+import com.example.commercepilot.customer.entity.Customer;
+import com.example.commercepilot.customer.repository.CustomerRepository;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import com.example.commercepilot.orders.dto.request.OrderCreateRequest;
@@ -10,11 +13,14 @@ import com.example.commercepilot.orders.dto.request.OrderDeleteRequest;
 import com.example.commercepilot.orders.dto.response.OrderCreateResponse;
 import com.example.commercepilot.orders.dto.response.OrderDeleteResponse;
 import com.example.commercepilot.orders.dto.response.OrderUpdateResponse;
-import com.example.commercepilot.orders.dto.session.SessionAdmin;
-import com.example.commercepilot.orders.dto.session.SessionCustomer;
+import com.example.commercepilot.customer.dto.session.LoginCustomer;
+import com.example.commercepilot.orders.dto.session.SessionResult;
 import com.example.commercepilot.orders.entity.Order;
 import com.example.commercepilot.orders.entity.OrderStatus;
 import com.example.commercepilot.orders.repository.OrderRepository;
+import com.example.commercepilot.product.entity.Product;
+import com.example.commercepilot.product.entity.ProductStatus;
+import com.example.commercepilot.product.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,7 +36,7 @@ public class OrderService {
     private final CustomerRepository customerRepository;
 
     @Transactional
-    public OrderCreateResponse add(SessionAdmin sessionAdmin, SessionCustomer sessionCustomer, OrderCreateRequest request) {
+    public OrderCreateResponse add(LoginAdmin loginAdmin, LoginCustomer loginCustomer, OrderCreateRequest request) {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
@@ -38,24 +44,9 @@ public class OrderService {
 
         long totalPrice = request.quantity() * product.getPrice();
 
-        Customer customer;
-        Admin admin = null;
-
-        if (sessionCustomer != null) {
-            customer = customerRepository.findById(sessionCustomer.customerId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-        } else {
-            if (sessionAdmin.role() != AdminRole.CS_ADMIN) {
-                throw new CustomException(ErrorCode.ACCESS_DENIED);
-            }
-            if (request.customerId() == null) {
-                throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
-            }
-            admin = adminRepository.findById(sessionAdmin.adminId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-            customer = customerRepository.findById(request.customerId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-        }
+        SessionResult sessionResult = resolveSession(loginAdmin, loginCustomer, request.customerId());
+        Customer customer = sessionResult.customer();
+        Admin admin = sessionResult.admin();
 
         product.decreaseStock(request.quantity());
 
@@ -90,24 +81,55 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDeleteResponse delete(Long orderId, SessionAdmin sessionAdmin, SessionCustomer sessionCustomer, OrderDeleteRequest request) {
+    public OrderDeleteResponse delete(Long orderId, LoginAdmin loginAdmin, LoginCustomer loginCustomer, OrderDeleteRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
         Long customerId = order.getCustomer().getId();
 
-        if (sessionCustomer != null && !sessionCustomer.customerId().equals(customerId)) {
-            throw new CustomException(ErrorCode.FORBIDDEN);
+        if (!loginCustomer.customerId().equals(customerId)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
+
+        resolveSession(loginAdmin, loginCustomer, customerId);
+
         if (!order.getStatus().equals(OrderStatus.PENDING)) {
             throw new CustomException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
         Product product = order.getProduct();
-        product.addStock(order.getQuantity());
+        product.increaseStock(order.getQuantity());
 
         order.cancel(request.cancelText());
 
         return OrderDeleteResponse.from(order);
+    }
+
+    private SessionResult resolveSession(
+            LoginAdmin loginAdmin, LoginCustomer loginCustomer, Long customerId) {
+
+        if (loginCustomer != null) {
+            Customer customer = customerRepository.findById(loginCustomer.customerId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+            return new SessionResult(customer, null);
+        }
+
+        if (loginAdmin == null) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+        if (loginAdmin.role() != AdminRole.CS_ADMIN) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+        if (customerId == null) {
+            throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
+        }
+
+        Admin admin = adminRepository.findById(loginAdmin.adminId())
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+
+        return new SessionResult(customer, admin);
     }
 }

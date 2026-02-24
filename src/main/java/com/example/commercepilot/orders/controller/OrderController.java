@@ -1,18 +1,14 @@
 package com.example.commercepilot.orders.controller;
 
+import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.exception.ApiResponse;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import com.example.commercepilot.orders.dto.request.OrderCreateRequest;
 import com.example.commercepilot.orders.dto.request.OrderDeleteRequest;
 import com.example.commercepilot.orders.dto.request.OrderSearchRequest;
-import com.example.commercepilot.orders.dto.response.OrderCreateResponse;
-import com.example.commercepilot.orders.dto.response.OrderDeleteResponse;
-import com.example.commercepilot.orders.dto.response.OrderDetailResponse;
-import com.example.commercepilot.orders.dto.response.OrderListResponse;
-import com.example.commercepilot.orders.dto.response.OrderUpdateResponse;
-import com.example.commercepilot.orders.dto.session.SessionAdmin;
-import com.example.commercepilot.orders.dto.session.SessionCustomer;
+import com.example.commercepilot.orders.dto.response.*;
+import com.example.commercepilot.customer.dto.session.LoginCustomer;
 import com.example.commercepilot.orders.service.OrderQueryService;
 import com.example.commercepilot.orders.service.OrderService;
 import jakarta.validation.Valid;
@@ -21,6 +17,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import static com.example.commercepilot.admin.config.SessionConst.LOGIN_ADMIN;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,15 +30,15 @@ public class OrderController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<OrderCreateResponse>> createOrder(
-            @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin,
-            @SessionAttribute(name = "loginCustomer", required = false) SessionCustomer sessionCustomer,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+            @SessionAttribute(name = "loginCustomer", required = false) LoginCustomer loginCustomer,
             @Valid @RequestBody OrderCreateRequest request
     ) {
-        if (sessionAdmin == null && sessionCustomer == null) {
+        if (loginAdmin == null && loginCustomer == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED, orderService.add(sessionAdmin, sessionCustomer, request)));
+                .body(ApiResponse.success(HttpStatus.CREATED, orderService.add(loginAdmin, loginCustomer, request)));
     }
 
 
@@ -60,9 +58,9 @@ public class OrderController {
     @PutMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderUpdateResponse>> updateOrder(
             @PathVariable Long orderId,
-            @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin
     ) {
-        if (sessionAdmin == null) {
+        if (loginAdmin == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
@@ -73,15 +71,15 @@ public class OrderController {
     @DeleteMapping("/{orderId}")
     public ResponseEntity<ApiResponse<OrderDeleteResponse>> deleteOrder(
             @PathVariable Long orderId,
-            @SessionAttribute(name = "loginAdmin", required = false) SessionAdmin sessionAdmin,
-            @SessionAttribute(name = "loginCustomer", required = false) SessionCustomer sessionCustomer,
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+            @SessionAttribute(name = "loginCustomer", required = false) LoginCustomer loginCustomer,
             @Valid @RequestBody OrderDeleteRequest request
     ) {
-        if (sessionAdmin == null && sessionCustomer == null) {
+        if (loginAdmin == null && loginCustomer == null) {
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         }
 
         return ResponseEntity.status(HttpStatus.OK)
-                .body(ApiResponse.success(HttpStatus.OK, orderService.delete(orderId, sessionAdmin, sessionCustomer, request)));
+                .body(ApiResponse.success(HttpStatus.OK, orderService.delete(orderId, loginAdmin, loginCustomer, request)));
     }
 }

@@ -14,7 +14,7 @@ public record OrderDeleteResponse(
     public static OrderDeleteResponse from(Order order) {
         return OrderDeleteResponse.builder()
                 .orderId(order.getId())
-                .productName(order.getProduct().getName())
+                .productName(order.getProduct().getProductName())
                 .quantity(order.getQuantity())
                 .totalPrice(order.getTotalPrice())
                 .build();
