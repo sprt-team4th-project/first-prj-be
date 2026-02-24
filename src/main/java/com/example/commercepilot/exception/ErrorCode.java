@@ -30,6 +30,7 @@ public enum ErrorCode {
     PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "P001", "단종된 상품입니다."),
     PRODUCT_SOLD_OUT(HttpStatus.BAD_REQUEST, "P002", "품절된 상품입니다."),
     INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "P003", "재고가 부족합니다."),
+    INVALID_STOCK_AMOUNT(HttpStatus.BAD_REQUEST, "P004", "재고 증감 수량은 1 이상이어야 합니다."),
 
     // 고객 관련 에러 코드("CU###")
     CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
