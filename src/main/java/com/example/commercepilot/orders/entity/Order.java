@@ -5,6 +5,7 @@ import com.example.commercepilot.config.BaseEntity;
 import com.example.commercepilot.customer.entity.Customer;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
+import com.example.commercepilot.product.entity.Product;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
