@@ -85,13 +85,15 @@ public class OrderService {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
 
-        Long customerId = order.getCustomer().getId();
+        if (loginCustomer != null) {
+            Long customerId = order.getCustomer().getId();
 
-        if (!loginCustomer.customerId().equals(customerId)) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
+            if (!loginCustomer.customerId().equals(customerId)) {
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
+            }
         }
 
-        resolveSession(loginAdmin, loginCustomer, customerId);
+        resolveSession(loginAdmin, loginCustomer, order.getCustomer().getId());
 
         if (!order.getStatus().equals(OrderStatus.PENDING)) {
             throw new CustomException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
