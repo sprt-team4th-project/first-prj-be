@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface OrderRepository extends JpaRepository<Order, Long> {
 
     @Query("SELECT o FROM Order o JOIN FETCH o.customer c " +
-            "WHERE (:keyword IS NULL OR o.orderNumber LIKE %:keyword% OR c.name LIKE %:keyword%) " +
+            "WHERE (:keyword IS NULL OR o.orderNumber LIKE %:keyword% OR c.customerName LIKE %:keyword%) " +
             "AND (:status IS NULL OR o.status = :status)")
     Page<Order> findByKeywordAndStatus(
             @Param("keyword") String keyword,
