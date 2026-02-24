@@ -1,6 +1,5 @@
 package com.example.commercepilot.exception;
 
-import com.example.commercepilot.category.entity.Category;
 import lombok.Getter;
 import org.springframework.http.HttpStatus;
 
@@ -18,7 +17,7 @@ public enum ErrorCode {
 //    일정 관련 에러 코드("S###")
     SCHEDULE_NOT_FOUND(HttpStatus.NOT_FOUND, "S001", "해당 일정은 존재하지 않습니다."),
 
-    // 관리자 관련 에러 코드("M###")
+//    관리자 관련 에러 코드("M###")
     ADMIN_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "M001", "이미 사용 중인 이메일입니다."),
     ADMIN_NOT_FOUND(HttpStatus.NOT_FOUND, "M002", "해당 관리자는 존재하지 않습니다."),
     ADMIN_LOGIN_NOT_ACTIVE(HttpStatus.FORBIDDEN, "M003", "활성 상태의 관리자만 로그인할 수 있습니다."),
@@ -27,7 +26,7 @@ public enum ErrorCode {
     ADMIN_SUSPENDED(HttpStatus.FORBIDDEN, "M006", "정지된 계정입니다."),
     ADMIN_INACTIVE(HttpStatus.FORBIDDEN, "M007", "비활성화된 계정입니다."),
 
-    // 상품 관련 에러 코드("P###")
+//    상품 관련 에러 코드("P###")
     PRODUCT_DISCONTINUED(HttpStatus.BAD_REQUEST, "P001", "단종된 상품입니다."),
     PRODUCT_SOLD_OUT(HttpStatus.BAD_REQUEST, "P002", "품절된 상품입니다."),
     INSUFFICIENT_STOCK(HttpStatus.BAD_REQUEST, "P003", "재고가 부족합니다."),
@@ -37,7 +36,7 @@ public enum ErrorCode {
     PRODUCT_NAME_BLANK(HttpStatus.BAD_REQUEST, "P007", "상품명은 공백일 수 없습니다."),
 
 
-    // 고객 관련 에러 코드("CU###")
+//    고객 관련 에러 코드("CU###")
     CUSTOMER_ID_REQUIRED(HttpStatus.BAD_REQUEST, "CU001", "고객 ID는 필수입니다."),
     CUSTOMER_NOT_FOUND(HttpStatus.NOT_FOUND, "CU002", "해당 고객을 찾을 수 없습니다."),
     CUSTOMER_EMAIL_DUPLICATED(HttpStatus.CONFLICT, "CU003", "이미 사용 중인 이메일입니다."),
@@ -52,13 +51,16 @@ public enum ErrorCode {
 //    로그인 관련 에러 코드("L###")
     LOGIN_FAILED(HttpStatus.UNAUTHORIZED, "L001", "이메일 또는 비밀번호가 일치하지 않습니다."),
 
-    // 주문 관련 에러 코드("O###")
+//    주문 관련 에러 코드("O###")
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "O001", "해당 주문을 찾을 수 없습니다."),
     ORDER_CANCEL_NOT_ALLOWED(HttpStatus.BAD_REQUEST, "O002", "취소할 수 없는 주문입니다."),
     ORDER_STATUS_NOT_CHANGEABLE(HttpStatus.BAD_REQUEST, "O003", "변경할 수 없는 주문 상태입니다."),
 
-    // 카테고리 관련 에러 코드("CA###")
-    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CA001", "해당 카테고리를 찾을 수 없습니다.");
+//    카테고리 관련 에러 코드("CA###")
+    CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CA001", "해당 카테고리는 존재하지 않습니다."),
+    SELF_REFERENCE_CATEGORY(HttpStatus.BAD_REQUEST, "CA002", "자신을 부모 카테고리로 가질 수 없습니다."),
+    CIRCULAR_CATEGORY_REFERENCE(HttpStatus.BAD_REQUEST, "CA003", "자식이 부모가 되는 참조를 만들 수 없습니다."),
+    DUPLICATE_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "CA004", "해당 카테고리명은 이미 존재합니다.");
 
     private final HttpStatus status;
     private final String code;
