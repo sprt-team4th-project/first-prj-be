@@ -25,5 +25,8 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
     @Query(value = "SELECT * FROM category WHERE id = :id AND is_deleted = true", nativeQuery = true)
     Optional<Category> findDeletedById(@Param("id") Long id);
 
+    @Query(value = "SELECT * FROM category WHERE id = :id", nativeQuery = true)
+    Optional<Category> findByIdIgnoreDeleted(@Param("id") Long parentId);
+
     boolean existsByName(String name);
 }

@@ -65,6 +65,16 @@ public class CategoryService {
     public void restore(Long categoryId) {
         Category category = categoryRepository.findDeletedById(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+
+        if (category.getParentId() != null) {
+            Category parentCategory = categoryRepository.findByIdIgnoreDeleted(category.getParentId())
+                    .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
+
+            if (parentCategory.isDeleted()) {
+                throw new CustomException(ErrorCode.CATEGORY_PARENT_DELETED);
+            }
+        }
+
         category.restore();
     }
 

@@ -60,7 +60,8 @@ public enum ErrorCode {
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "CA001", "해당 카테고리는 존재하지 않습니다."),
     SELF_REFERENCE_CATEGORY(HttpStatus.BAD_REQUEST, "CA002", "자신을 부모 카테고리로 가질 수 없습니다."),
     CIRCULAR_CATEGORY_REFERENCE(HttpStatus.BAD_REQUEST, "CA003", "자식이 부모가 되는 참조를 만들 수 없습니다."),
-    DUPLICATE_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "CA004", "해당 카테고리명은 이미 존재합니다.");
+    DUPLICATE_CATEGORY_NAME(HttpStatus.BAD_REQUEST, "CA004", "해당 카테고리명은 이미 존재합니다."),
+    CATEGORY_PARENT_DELETED(HttpStatus.CONFLICT, "CA005", "부모 카테고리가 삭제된 상태입니다.");
 
     private final HttpStatus status;
     private final String code;
