@@ -21,7 +21,7 @@ public class CustomerService {
 
     private final CustomerRepository customerRepository;
 
-    // 고객 정보 수정 (본인만 가능)
+    // 고객 정보 수정 (관리자만 가능)
     @Transactional
     public CustomerUpdateResponse update(Long customerId, CustomerUpdateRequest request) {
         Customer customer = customerRepository.findById(customerId)
