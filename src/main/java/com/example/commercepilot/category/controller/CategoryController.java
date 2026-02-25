@@ -63,8 +63,7 @@ public class CategoryController {
 
     @GetMapping("/deleted")
     public ResponseEntity<ApiResponse<List<CategoryDeleteResponse>>> getDeletedCategories(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) com.example.commercepilot.admin.dto.session.LoginAdmin loginAdmin,
-            @RequestParam(name = "status") HttpStatus status) {
+            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin) {
 
         if (loginAdmin == null) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
