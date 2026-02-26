@@ -1,14 +1,11 @@
 package com.example.commercepilot.customer.entity;
 
 import com.example.commercepilot.config.BaseEntity;
-import org.hibernate.annotations.SoftDelete;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SoftDelete;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
-import java.time.LocalDateTime;
 
 @Getter
 @Entity

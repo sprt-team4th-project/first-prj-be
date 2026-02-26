@@ -1,10 +1,13 @@
 package com.example.commercepilot.customer.service;
 
 import com.example.commercepilot.customer.dto.request.CustomerSearchRequest;
+import com.example.commercepilot.customer.dto.response.CustomerDetailResponse;
 import com.example.commercepilot.customer.dto.response.CustomerListResponse;
 import com.example.commercepilot.customer.entity.Customer;
 import com.example.commercepilot.customer.repository.CustomerRepository;
 import com.example.commercepilot.customer.repository.CustomerSpecifications;
+import com.example.commercepilot.exception.CustomException;
+import com.example.commercepilot.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,5 +37,12 @@ public class CustomerQueryService {
 
         return customerRepository.findAll(spec, pageable)
                 .map(CustomerListResponse::from);
+    }
+
+    public CustomerDetailResponse getCustomer(Long customerId) {
+        Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+
+        return CustomerDetailResponse.from(customer);
     }
 }

@@ -15,38 +15,44 @@ import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.SessionAttribute;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/admins")
-
 public class AdminAuthController {
 
     private final AdminCommandService adminCommandService;
     private final AdminAuthService adminAuthService;
 
     @PostMapping("/signup")
-    public ApiResponse<AdminSignupResponse> signup(@Valid @RequestBody AdminSignupRequest request) {
+    public ResponseEntity<ApiResponse<AdminSignupResponse>> signup(@Valid @RequestBody AdminSignupRequest request) {
         AdminSignupResponse response = adminCommandService.signup(request);
-        return ApiResponse.success(HttpStatus.CREATED, response);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(HttpStatus.CREATED, response));
     }
 
     @PostMapping("/login")
-    public ApiResponse<Void> login(@Valid @RequestBody AdminLoginRequest request, HttpSession session) {
+    public ResponseEntity<ApiResponse<Void>> login(@Valid @RequestBody AdminLoginRequest request, HttpSession session) {
         adminAuthService.login(request, session);
-        return ApiResponse.success(HttpStatus.OK);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK));
     }
 
     @PostMapping("/logout")
-    public ApiResponse<Void> logout(HttpSession session) {
+    public ResponseEntity<ApiResponse<Void>> logout(HttpSession session) {
         adminAuthService.logout(session);
-        return ApiResponse.success(HttpStatus.OK);
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK));
     }
 
     @PatchMapping("/me/password")
-    public ApiResponse<Void> changePassword(
+    public ResponseEntity<ApiResponse<Void>> changePassword(
             @Valid @RequestBody AdminPasswordChangeRequest request,
             @SessionAttribute(name = SessionConst.LOGIN_ADMIN, required = false) LoginAdmin loginAdmin
     ) {
@@ -55,6 +61,9 @@ public class AdminAuthController {
         }
 
         adminCommandService.changePassword(loginAdmin.adminId(), request);
-        return ApiResponse.success(HttpStatus.OK);
+
+        return ResponseEntity
+                .status(HttpStatus.OK)
+                .body(ApiResponse.success(HttpStatus.OK));
     }
 }
