@@ -69,7 +69,7 @@ public interface CategoryRepository extends JpaRepository<Category, Long> {
                         """, nativeQuery = true)
     List<Long> findAllDescendantIds(@Param("rootId") Long rootId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE Category c SET c.isDeleted = true, c.deletedAt = :now WHERE c.id IN :ids")
     void softDeleteAllByIds(@Param("ids") List<Long> ids, @Param("now") LocalDateTime now);
 
