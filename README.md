@@ -47,11 +47,66 @@
 - **데이터 정합성**: 주문 시 재고 차감 및 취소 시 복구 로직의 트랜잭션 보장
 - **확장성 있는 설계**: 공통 DTO와 페이징 처리를 통한 일관된 API 구조
 
----
-
 ## 🗂 ERD (Entity Relationship Diagram)
 
 <img width="1280" height="842" alt="Image" src="https://github.com/user-attachments/assets/fb60e0e9-4fcb-48e9-a3d2-b563e266be9d" />
+
+---
+#### Table: admin
+
+| 컬럼명         | 필드명        | 타입(DB)       | NULL | KEY | 제약/설명       |
+| ----------- | ---------- | ------------ | ---- | --- |-------------|
+| id          | id         | BIGINT       | X    | PK  | 식별자         |
+| admin_name  | adminName  | VARCHAR(50)  | X    |     | 관리자 이름      |
+| email       | email      | VARCHAR(100) | X    | UQ  | unique      |
+| password    | password   | VARCHAR(255) | X    |     | 비밀번호(암호화)   |
+| call_number | callNumber | VARCHAR(20)  | X    |     | 연락처         |
+| role        | role       | VARCHAR(30)  | X    |     | ENUM 문자열 저장 |
+| status      | status     | VARCHAR(30)  | X    |     | ENUM 문자열 저장 |
+
+
+#### Table: category
+| 컬럼명        | 필드명               | 타입(DB)       | NULL | KEY | 제약/설명                   |
+| ---------- | ----------------- | ------------ | ---- | --- |-------------------------|
+| id         | id                | BIGINT       | X    | PK  | 식별자                     |
+| name       | name              | VARCHAR(255) | X    | UQ  | unique                  |
+| is_deleted | isDeleted         | BOOLEAN      | X    |     | 논리삭제 여부                 |
+| deleted_at | deletedAt         | DATETIME     | O    |     | 삭제 시각                   |
+| parent_id  | parentId / parent | BIGINT       | O    | FK  | self FK (`category.id`) |
+
+#### Table: customer
+| 컬럼명           | 필드명          | 타입(DB)       | NULL | KEY | 제약/설명       |
+| ------------- | ------------ | ------------ | ---- | --- | ----------- |
+| id            | id           | BIGINT       | X    | PK  | 식별자         |
+| customer_name | customerName | VARCHAR(255) | X    |     | 고객 이름       |
+| email         | email        | VARCHAR(255) | X    | UQ  | 유니크         |
+| call_number   | callNumber   | VARCHAR(255) | X    |     | 전화번호        |
+| password      | password     | VARCHAR(255) | X    |     | 비밀번호        |
+| status        | status       | VARCHAR(255) | X    |     | ENUM 문자열 저장 |
+
+#### Table: product
+| 컬럼명          | 필드명         | 타입(DB)       | NULL | KEY | 제약/설명                   |
+| ------------ | ----------- | ------------ | ---- | --- |-------------------------|
+| id           | id          | BIGINT       | X    | PK  | 식별자                     |
+| product_name | productName | VARCHAR(50)  | X    | UQ  | unique                  |
+| price        | price       | BIGINT       | X    |     | 가격                      |
+| stock        | stock       | INT          | X    |     | 재고                      |
+| status       | status      | VARCHAR(255) | X    |     | ENUM 문자열 저장             |
+| admin_id     | admin       | BIGINT       | X    | FK  | 관리자 FK (`admin.id`)     |
+| category_id  | category    | BIGINT       | X    | FK  | 카테고리 FK (`category.id`) |
+
+#### Table: Order
+| 컬럼명          | 필드명         | 타입(DB)       | NULL | KEY | 제약/설명                 |
+| ------------ | ----------- | ------------ | ---- | --- | --------------------- |
+| id           | id          | BIGINT       | X    | PK  | 식별자                   |
+| order_number | orderNumber | VARCHAR(20)  | X    | UQ  | 주문번호                  |
+| total_price  | totalPrice  | BIGINT       | O    |     | 총금액                   |
+| quantity     | quantity    | INT          | X    |     | 수량                    |
+| cancel_text  | cancelText  | VARCHAR(255) | O    |     | 취소사유                  |
+| customer_id  | customer    | BIGINT       | X    | FK  | 고객 FK (`customer.id`) |
+| product_id   | product     | BIGINT       | X    | FK  | 상품 FK (`product.id`)  |
+| admin_id     | admin       | BIGINT       | O    | FK  | 관리자 FK (`admin.id`)   |
+| status       | status      | VARCHAR(255) | O    |     | ENUM 문자열 저장           |
 
 ### 데이터베이스 구조
 
@@ -297,3 +352,15 @@ java -jar build/libs/CommercePilot-0.0.1-SNAPSHOT.jar
 - **정민교 (Presenter)**: 레이어 책임 분리와 코드 개선에 전반적으로 만족함. 향후 프로젝트 초기 설계 단계에서 도메인 책임 할당과 세션 정의에 대해 더 깊은 고민이 필요함을 체감함.
 - **신현민 (Sub Leader)**: 공통 DTO를 활용한 코드 가독성 향상을 체감함. 앞으로도 원활한 소통을 유지하고 기술적 기본 구성을 탄탄히 하는 데 주력할 예정.
 - **이지혜 (Recorder)**: 패키지 구성 및 기능 구현 경험에 만족함. 앞으로 Git 조작에 더욱 주의를 기울이겠다고 다짐함.
+
+## 👨‍💻 Team (4조. 결제는 제가 하겠습니다)
+
+| Name | GitHub                                            |
+| ---- | ------------------------------------------------- |
+| 정채림  | https://github.com/fryzke                         |
+| 이지민  | https://github.com/jiiimni                        |
+| 이재민  | https://github.com/CheatIsKey                     |
+| 정민교  | https://github.com/DuJjoneKoo/potential-guacamole |
+| 신현민  | https://github.com/hyeonmin02                     |
+| 이지혜  | https://github.com/singasong219                   |
+
