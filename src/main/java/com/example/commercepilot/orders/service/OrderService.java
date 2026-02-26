@@ -37,7 +37,7 @@ public class OrderService {
 
     @Transactional
     public OrderCreateResponse add(LoginAdmin loginAdmin, LoginCustomer loginCustomer, OrderCreateRequest request) {
-        Product product = productRepository.findById(request.productId())
+        Product product = productRepository.findByIdWithLock(request.productId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
         validateProduct(product, request);
@@ -99,9 +99,11 @@ public class OrderService {
             throw new CustomException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
-        Product product = order.getProduct();
-        product.increaseStock(order.getQuantity());
+//        Product product = order.getProduct();
+        Product product = productRepository.findByIdWithLock(order.getProduct().getId())
+                .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
+        product.increaseStock(order.getQuantity());
         order.cancel(request.cancelText());
 
         return OrderDeleteResponse.from(order);
