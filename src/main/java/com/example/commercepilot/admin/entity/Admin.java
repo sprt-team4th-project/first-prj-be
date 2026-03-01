@@ -1,11 +1,11 @@
 package com.example.commercepilot.admin.entity;
 
-import com.example.commercepilot.config.PasswordEncoder;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDateTime;
 

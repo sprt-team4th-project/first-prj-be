@@ -1,8 +1,6 @@
 package com.example.commercepilot.product.service;
 
-import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.admin.entity.Admin;
-import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.repository.AdminRepository;
 import com.example.commercepilot.category.entity.Category;
 import com.example.commercepilot.category.repository.CategoryRepository;
@@ -30,17 +28,21 @@ public class ProductCommandService {
     private final ProductRepository productRepository;
 
     // 관리자 권한 및 존재 여부 검증
-    private Admin validateAdmin(LoginAdmin loginAdmin) {
-        if (loginAdmin == null) {
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        }
-        Admin admin = adminRepository.findById(loginAdmin.adminId()).orElseThrow(
-                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        if (loginAdmin.role() != AdminRole.OPERATION_ADMIN && loginAdmin.role() != AdminRole.SUPER_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        return admin;
+//    private Admin validateAdmin(LoginAdmin loginAdmin) {
+//        if (loginAdmin == null) {
+//            throw new CustomException(ErrorCode.UNAUTHORIZED);
+//        }
+//        Admin admin = adminRepository.findById(loginAdmin.adminId()).orElseThrow(
+//                () -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+//
+//        if (loginAdmin.role() != AdminRole.OPERATION_ADMIN && loginAdmin.role() != AdminRole.SUPER_ADMIN) {
+//            throw new CustomException(ErrorCode.ACCESS_DENIED);
+//        }
+//        return admin;
+//    }
+    private Admin validateAdmin(Long adminId) {
+        return adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
     }
 
     // 삭제/수정 대상 상품 존재 검증
@@ -55,9 +57,10 @@ public class ProductCommandService {
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 
-    public ProductCreateResponse createProduct(LoginAdmin loginAdmin, ProductCreateRequest request) {
+//    public ProductCreateResponse createProduct(LoginAdmin loginAdmin, ProductCreateRequest request) {
+    public ProductCreateResponse createProduct(Long adminId, ProductCreateRequest request) {
 
-        Admin admin = validateAdmin(loginAdmin);
+        Admin admin = validateAdmin(adminId);
 
         Category category = validateCategory(request.categoryId());
 
@@ -75,9 +78,10 @@ public class ProductCommandService {
         return ProductCreateResponse.from(savedProduct);
     }
 
-    public ProductUpdateResponse updateProduct(LoginAdmin loginAdmin, ProductUpdateRequest request, Long productId) {
+//    public ProductUpdateResponse updateProduct(LoginAdmin loginAdmin, ProductUpdateRequest request, Long productId) {
+    public ProductUpdateResponse updateProduct(Long adminId, ProductUpdateRequest request, Long productId) {
 
-        validateAdmin(loginAdmin);
+        validateAdmin(adminId);
 
         Product product = validateProduct(productId);
 
@@ -90,18 +94,20 @@ public class ProductCommandService {
         return ProductUpdateResponse.from(product);
     }
 
-    public void deleteProduct(LoginAdmin loginAdmin, Long productId) {
+//    public void deleteProduct(LoginAdmin loginAdmin, Long productId) {
+    public void deleteProduct(Long adminId, Long productId) {
 
-        validateAdmin(loginAdmin);
+        validateAdmin(adminId);
 
         validateProduct(productId);
 
         productRepository.deleteById(productId);
     }
 
-    public StockChangeResponse updateStock(LoginAdmin loginAdmin, Long productId, int newStock) {
+//    public StockChangeResponse updateStock(LoginAdmin loginAdmin, Long productId, int newStock) {
+    public StockChangeResponse updateStock(Long adminId, Long productId, int newStock) {
 
-        validateAdmin(loginAdmin);
+        validateAdmin(adminId);
 
         Product product = validateProduct(productId);
 
@@ -110,9 +116,10 @@ public class ProductCommandService {
         return StockChangeResponse.from(product);
     }
 
-    public StockChangeResponse increaseStock(LoginAdmin loginAdmin, Long productId, int amount) {
+//    public StockChangeResponse increaseStock(LoginAdmin loginAdmin, Long productId, int amount) {
+    public StockChangeResponse increaseStock(Long adminId, Long productId, int amount) {
 
-        validateAdmin(loginAdmin);
+        validateAdmin(adminId);
 
         Product product = validateProduct(productId);
 
@@ -121,9 +128,10 @@ public class ProductCommandService {
         return StockChangeResponse.from(product);
     }
 
-    public StockChangeResponse decreaseStock(LoginAdmin loginAdmin, Long productId, int amount) {
+//    public StockChangeResponse decreaseStock(LoginAdmin loginAdmin, Long productId, int amount) {
+    public StockChangeResponse decreaseStock(Long adminId, Long productId, int amount) {
 
-        validateAdmin(loginAdmin);
+        validateAdmin(adminId);
 
         Product product = validateProduct(productId);
 
@@ -132,8 +140,9 @@ public class ProductCommandService {
         return StockChangeResponse.from(product);
     }
 
-    public void discontinueProduct(LoginAdmin loginAdmin, Long productId) {
-        validateAdmin(loginAdmin);
+//    public void discontinueProduct(LoginAdmin loginAdmin, Long productId) {
+    public void discontinueProduct(Long adminId, Long productId) {
+        validateAdmin(adminId);
 
         Product product = validateProduct(productId);
 

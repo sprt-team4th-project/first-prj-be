@@ -9,10 +9,10 @@ import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
-import com.example.commercepilot.config.PasswordEncoder;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

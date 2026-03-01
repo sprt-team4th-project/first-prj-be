@@ -1,6 +1,5 @@
 package com.example.commercepilot.orders.service;
 
-import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.admin.entity.AdminRole;
 import com.example.commercepilot.admin.repository.AdminRepository;
@@ -13,8 +12,6 @@ import com.example.commercepilot.orders.dto.request.OrderDeleteRequest;
 import com.example.commercepilot.orders.dto.response.OrderCreateResponse;
 import com.example.commercepilot.orders.dto.response.OrderDeleteResponse;
 import com.example.commercepilot.orders.dto.response.OrderUpdateResponse;
-import com.example.commercepilot.customer.dto.session.LoginCustomer;
-import com.example.commercepilot.orders.dto.session.SessionResult;
 import com.example.commercepilot.orders.entity.Order;
 import com.example.commercepilot.orders.entity.OrderStatus;
 import com.example.commercepilot.orders.repository.OrderRepository;
@@ -36,17 +33,23 @@ public class OrderService {
     private final CustomerRepository customerRepository;
 
     @Transactional
-    public OrderCreateResponse add(LoginAdmin loginAdmin, LoginCustomer loginCustomer, OrderCreateRequest request) {
+    public OrderCreateResponse add(Long adminId, OrderCreateRequest request) {
         Product product = productRepository.findById(request.productId())
                 .orElseThrow(() -> new CustomException(ErrorCode.PRODUCT_NOT_FOUND));
 
         validateProduct(product, request);
 
-        long totalPrice = request.quantity() * product.getPrice();
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
-        SessionResult sessionResult = resolveSession(loginAdmin, loginCustomer, request.customerId());
-        Customer customer = sessionResult.customer();
-        Admin admin = sessionResult.admin();
+        if (request.customerId() == null) {
+            throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
+        }
+
+        Customer customer = customerRepository.findById(request.customerId())
+                .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+
+        long totalPrice = request.quantity() * product.getPrice();
 
         product.decreaseStock(request.quantity());
 
@@ -81,57 +84,52 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderDeleteResponse delete(Long orderId, LoginAdmin loginAdmin, LoginCustomer loginCustomer, OrderDeleteRequest request) {
+    public OrderDeleteResponse delete(Long orderId, Long adminId, OrderDeleteRequest request) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new CustomException(ErrorCode.ORDER_NOT_FOUND));
-
-        if (loginCustomer != null) {
-            Long customerId = order.getCustomer().getId();
-
-            if (!loginCustomer.customerId().equals(customerId)) {
-                throw new CustomException(ErrorCode.ACCESS_DENIED);
-            }
-        }
-
-        resolveSession(loginAdmin, loginCustomer, order.getCustomer().getId());
 
         if (!order.getStatus().equals(OrderStatus.PENDING)) {
             throw new CustomException(ErrorCode.ORDER_CANCEL_NOT_ALLOWED);
         }
 
-        Product product = order.getProduct();
-        product.increaseStock(order.getQuantity());
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
 
+        if (admin.getRole() == AdminRole.CS_ADMIN && !order.getAdmin().getId().equals(adminId)) {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+        order.getProduct().increaseStock(order.getQuantity());
         order.cancel(request.cancelText());
 
         return OrderDeleteResponse.from(order);
     }
 
-    private SessionResult resolveSession(
-            LoginAdmin loginAdmin, LoginCustomer loginCustomer, Long customerId) {
-
-        if (loginCustomer != null) {
-            Customer customer = customerRepository.findById(loginCustomer.customerId())
-                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-            return new SessionResult(customer, null);
-        }
-
-        if (loginAdmin == null) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        if (loginAdmin.role() != AdminRole.CS_ADMIN) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-        if (customerId == null) {
-            throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
-        }
-
-        Admin admin = adminRepository.findById(loginAdmin.adminId())
-                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
-
-        Customer customer = customerRepository.findById(customerId)
-                .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
-
-        return new SessionResult(customer, admin);
-    }
+//    private SessionResult resolveSession(
+//            LoginAdmin loginAdmin, LoginCustomer loginCustomer, Long customerId) {
+//
+//        if (loginCustomer != null) {
+//            Customer customer = customerRepository.findById(loginCustomer.customerId())
+//                    .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+//            return new SessionResult(customer, null);
+//        }
+//
+//        if (loginAdmin == null) {
+//            throw new CustomException(ErrorCode.ACCESS_DENIED);
+//        }
+//        if (loginAdmin.role() != AdminRole.CS_ADMIN) {
+//            throw new CustomException(ErrorCode.ACCESS_DENIED);
+//        }
+//        if (customerId == null) {
+//            throw new CustomException(ErrorCode.CUSTOMER_ID_REQUIRED);
+//        }
+//
+//        Admin admin = adminRepository.findById(loginAdmin.adminId())
+//                .orElseThrow(() -> new CustomException(ErrorCode.ADMIN_NOT_FOUND));
+//
+//        Customer customer = customerRepository.findById(customerId)
+//                .orElseThrow(() -> new CustomException(ErrorCode.CUSTOMER_NOT_FOUND));
+//
+//        return new SessionResult(customer, admin);
+//    }
 }
