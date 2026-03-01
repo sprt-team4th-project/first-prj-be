@@ -13,6 +13,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -42,7 +43,7 @@ public class CategoryService {
     }
 
     public CategoryResponse getCategory(Long categoryId) {
-        Category category = categoryRepository.findById(categoryId)
+        Category category = categoryRepository.findByIdWithParent(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
         return CategoryResponse.from(category);
@@ -50,7 +51,7 @@ public class CategoryService {
 
     @Transactional
     public CategoryResponse update(Long categoryId, CategoryUpdateRequest request) {
-        Category category = categoryRepository.findById(categoryId)
+        Category category = categoryRepository.findByIdWithParentAndChildren(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Category parentCategory = findParentCategory(request.parentCategoryId());
@@ -80,12 +81,21 @@ public class CategoryService {
 
     @Transactional
     public CategoryDeleteResponse delete(Long categoryId) {
-        Category category = categoryRepository.findByIdWithChildren(categoryId)
+        Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CustomException(ErrorCode.CATEGORY_NOT_FOUND));
 
-        category.deleteWithDescendants();
+        List<Long> allIds = categoryRepository.findAllDescendantIds(categoryId);
+        LocalDateTime now = LocalDateTime.now();
+        categoryRepository.softDeleteAllByIds(allIds, now);
 
-        return CategoryDeleteResponse.from(category);
+//        @Modifying 벌크 쿼리는 DB만 업데이트하고 영속성 컨텍스트는 건드리지 않는다.
+//        DB에 넣은 삭제 시간을 똑같이 반환할 수 있게 DTO를 직접 구성했다.
+//        return CategoryDeleteResponse.from(category);
+        return CategoryDeleteResponse.builder()
+                .categoryId(category.getId())
+                .categoryName(category.getName())
+                .deletedAt(now)
+                .build();
     }
 
     private Category findParentCategory(Long parentId) {
