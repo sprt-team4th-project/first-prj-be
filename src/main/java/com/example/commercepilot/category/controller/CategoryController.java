@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -32,6 +33,7 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     @PostMapping
     public ResponseEntity<ApiResponse<CategoryCreateResponse>> createCategory(
             @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
@@ -61,18 +63,14 @@ public class CategoryController {
                 .body(ApiResponse.success(HttpStatus.OK, categoryService.getCategory(categoryId)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     @GetMapping("/deleted")
-    public ResponseEntity<ApiResponse<List<CategoryDeleteResponse>>> getDeletedCategories(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin) {
-
-        if (loginAdmin == null) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
-
+    public ResponseEntity<ApiResponse<List<CategoryDeleteResponse>>> getDeletedCategories() {
         return ResponseEntity.status(HttpStatus.OK)
                 .body(ApiResponse.success(HttpStatus.OK, categoryService.getDeletedCategories()));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     @PutMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryResponse>> updateCategory(
             @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
@@ -87,6 +85,7 @@ public class CategoryController {
                 .body(ApiResponse.success(HttpStatus.OK, categoryService.update(categoryId, request)));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     @PutMapping("/{categoryId}/restore")
     public ResponseEntity<ApiResponse<Void>> restoreCategory(
             @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
@@ -100,6 +99,7 @@ public class CategoryController {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK));
     }
 
+    @PreAuthorize("hasAnyRole('SUPER_ADMIN', 'OPERATION_ADMIN')")
     @DeleteMapping("/{categoryId}")
     public ResponseEntity<ApiResponse<CategoryDeleteResponse>> deleteCategory(
             @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,

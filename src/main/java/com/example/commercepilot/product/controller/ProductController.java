@@ -1,20 +1,19 @@
 package com.example.commercepilot.product.controller;
 
-import com.example.commercepilot.admin.config.SessionConst;
-import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.exception.ApiResponse;
 import com.example.commercepilot.product.dto.request.*;
 import com.example.commercepilot.product.dto.response.*;
 import com.example.commercepilot.product.service.ProductCommandService;
 import com.example.commercepilot.product.service.ProductQueryService;
+import com.example.commercepilot.web.AdminUserDetails;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
-
-import static com.example.commercepilot.admin.config.SessionConst.LOGIN_ADMIN;
 
 @RestController
 @RequestMapping("/api/products")
@@ -24,21 +23,27 @@ public class ProductController {
     private final ProductCommandService productCommandService;
     private final ProductQueryService productQueryService;
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @PostMapping // 상품 생성
     public ResponseEntity<ApiResponse<ProductCreateResponse>> createProduct(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = SessionConst.LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @Valid @RequestBody ProductCreateRequest request) {
+//        return ResponseEntity.status(HttpStatus.CREATED)
+//                .body(ApiResponse.success(HttpStatus.CREATED, productCommandService.createProduct(loginAdmin, request)));
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(ApiResponse.success(HttpStatus.CREATED, productCommandService.createProduct(loginAdmin, request)));
+                .body(ApiResponse.success(HttpStatus.CREATED, productCommandService.createProduct(adminUserDetails.getId(), request)));
     }
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @PatchMapping("/{productId}") // 상품 수정 (상품명, 카테고리, 가격)
     public ResponseEntity<ApiResponse<ProductUpdateResponse>> updateProduct(
-            @SessionAttribute(name = LOGIN_ADMIN , required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @Valid @RequestBody ProductUpdateRequest request,
             @PathVariable Long productId) {
         return ResponseEntity.ok
-                (ApiResponse.success(HttpStatus.OK, productCommandService.updateProduct(loginAdmin, request, productId)));
+                (ApiResponse.success(HttpStatus.OK, productCommandService.updateProduct(adminUserDetails.getId(), request, productId)));
     }
 
     @GetMapping("/{productId}") // 상품 상세 조회
@@ -54,47 +59,57 @@ public class ProductController {
                 ApiResponse.success(HttpStatus.OK, productQueryService.getProductList(request)));
     }
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @DeleteMapping("/{productId}") // 상품 단건 삭제
     public ResponseEntity<ApiResponse<Void>> deleteProduct(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @PathVariable Long productId) {
-        productCommandService.deleteProduct(loginAdmin, productId);
+        productCommandService.deleteProduct(adminUserDetails.getId(), productId);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK));
     }
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @PatchMapping("/{productId}/stock") // 재고 값 변경
     public ResponseEntity<ApiResponse<StockChangeResponse>> changeStock(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @PathVariable Long productId,
             @RequestBody StockChangeRequest request) {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK,
-                productCommandService.updateStock(loginAdmin, productId, request.newStock())));
+                productCommandService.updateStock(adminUserDetails.getId(), productId, request.newStock())));
     }
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @PatchMapping("/{productId}/stock/increase") // 기존 재고 추가
     public ResponseEntity<ApiResponse<StockChangeResponse>> increaseStock(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @PathVariable Long productId,
             @RequestBody StockAmountRequest request) {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK,
-                productCommandService.increaseStock(loginAdmin, productId, request.amount())));
+                productCommandService.increaseStock(adminUserDetails.getId(), productId, request.amount())));
     }
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @PatchMapping("/{productId}/stock/decrease") // 기존 재고 감소
     public ResponseEntity<ApiResponse<StockChangeResponse>> decreaseStock(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @PathVariable Long productId,
             @RequestBody StockAmountRequest request) {
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK,
-                productCommandService.decreaseStock(loginAdmin, productId, request.amount())));
+                productCommandService.decreaseStock(adminUserDetails.getId(), productId, request.amount())));
     }
 
+    @PreAuthorize("hasAnyRole('OPERATION_ADMIN', 'SUPER_ADMIN')")
     @PatchMapping("/{productId}/status/discontinue") // 재고상태 단종으로 변경
     public ResponseEntity<ApiResponse<Void>> discontinueProduct(
-            @SessionAttribute(name = LOGIN_ADMIN, required = false) LoginAdmin loginAdmin,
+//            @SessionAttribute(name = "loginAdmin", required = false) LoginAdmin loginAdmin,
+            @AuthenticationPrincipal AdminUserDetails adminUserDetails,
             @PathVariable Long productId
     ) {
-        productCommandService.discontinueProduct(loginAdmin, productId);
+        productCommandService.discontinueProduct(adminUserDetails.getId(), productId);
         return ResponseEntity.ok(ApiResponse.success(HttpStatus.OK));
     }
 }

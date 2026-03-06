@@ -1,16 +1,14 @@
 package com.example.commercepilot.admin.service;
 
-import com.example.commercepilot.admin.config.SessionConst;
 import com.example.commercepilot.admin.dto.request.AdminLoginRequest;
-import com.example.commercepilot.admin.dto.session.LoginAdmin;
 import com.example.commercepilot.admin.entity.Admin;
 import com.example.commercepilot.admin.entity.AdminStatus;
 import com.example.commercepilot.admin.repository.AdminRepository;
-import com.example.commercepilot.config.PasswordEncoder;
 import com.example.commercepilot.exception.CustomException;
 import com.example.commercepilot.exception.ErrorCode;
-import jakarta.servlet.http.HttpSession;
+import com.example.commercepilot.web.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,9 +18,10 @@ public class AdminAuthService {
 
     private final AdminRepository adminRepository;
     private final PasswordEncoder passwordEncoder;
+    private final JwtUtil jwtUtil;
 
     @Transactional(readOnly = true)
-    public void login(AdminLoginRequest request, HttpSession session) {
+    public String login(AdminLoginRequest request) {
 
         Admin admin = adminRepository.findByEmail(request.email())
                 .orElseThrow(() -> new CustomException(ErrorCode.LOGIN_FAILED));
@@ -35,16 +34,18 @@ public class AdminAuthService {
         // 상태별 로그인 차단
         validateLoginStatus(admin.getStatus());
 
-        // 세션 저장 (필수: categoryId/email/role)
-        LoginAdmin loginAdmin = new LoginAdmin(admin.getId(), admin.getEmail(), admin.getRole());
-        session.setAttribute(SessionConst.LOGIN_ADMIN, loginAdmin);
+        return jwtUtil.generateToken(admin.getId(), admin.getEmail(), admin.getRole());
 
-        // 세션 유효시간은 application.properties (24h)로 설정됨
+//        // 세션 저장 (필수: categoryId/email/role)
+//        LoginAdmin loginAdmin = new LoginAdmin(admin.getId(), admin.getEmail(), admin.getRole());
+//        session.setAttribute(SessionConst.LOGIN_ADMIN, loginAdmin);
+//
+//        // 세션 유효시간은 application.properties (24h)로 설정됨
     }
 
-    public void logout(HttpSession session) {
-        session.invalidate();
-    }
+//    public void logout(HttpSession session) {
+//        session.invalidate();
+//    }
 
     private void validateLoginStatus(AdminStatus status) {
         if (status == null) {
